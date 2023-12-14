@@ -40,7 +40,7 @@ def download_file(repo, src_file_name, dest_file_name):
 
 
 def crawl_cldf():
-    github = Github(params.token)
+    github = Github(params.github_token)
     repos = []
     for user in params.source_types["cldf"]:
         if user in params.sources:
@@ -75,7 +75,7 @@ def crawl_cp():
     source = params.source_types["correspondence"][0]
     if not source in params.sources:
         return
-    repo = Github(params.token).get_user(cp_user_name).get_repo(source)
+    repo = Github(params.github_token).get_user(cp_user_name).get_repo(source)
     #all files from same repo, so check only at first file
     some_ds_id = repo.get_contents(cp_src_dirs[0])[0].path.split("/")[-1].split(".")[0]
     meta_path = os.path.join(pb.source_path("native", some_ds_id, source), "meta.json")

@@ -1,2 +1,3 @@
 example_data/
-**/__pycache__/
+**/__pycache__
+lingdata/__pycache__/

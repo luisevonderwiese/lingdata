@@ -412,7 +412,7 @@ def test_partitioning():
 
 
 
-config_path = "database_test_config.json"
+config_path = "lingdata_test_config.json"
 lingdata.read_config(config_path)
 
 

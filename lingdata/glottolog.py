@@ -40,7 +40,7 @@ def download_file(repo, file_name, sha):
 
 def crawl():
     glottolog_path = pb.domain_path("glottolog")
-    github = Github(params.token)
+    github = Github(params.github_token)
     cldf_repo = github.get_repo(cldf_repo_name)
     tag = next((x for x in cldf_repo.get_tags() if x.name == params.glottolog_version))
     cldf_sha = tag.commit.sha

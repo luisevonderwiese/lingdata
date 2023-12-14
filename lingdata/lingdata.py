@@ -58,6 +58,7 @@ def read_config(config_path):
     params.glottolog_tree_required = json_object["glottolog_tree_required"]
 
     params.flat_paths = json_object["flat_paths"]
+    params.github_token = json_object["github_token"]
 
 def data():
     metadata_path = pb.metadata_path()

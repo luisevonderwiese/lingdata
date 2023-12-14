@@ -12,8 +12,8 @@ pd.set_option('display.max_rows', None)
 
 config_path = "lingdata_example_config.json"
 lingdata.read_config(config_path)
-#lingdata.update_native()
-#lingdata.generate_data()
+lingdata.update_native()
+lingdata.generate_data()
 df = lingdata.data()
 
 
