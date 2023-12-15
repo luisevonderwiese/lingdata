@@ -2,12 +2,11 @@
 "max_num_chars" : 3000,
 "family_split_threshold": 10000000000,
 "num_samples" : 100,
-"data_dir" : "/home/haeusele/PhD/lingdata/test_data/generated",
-"native_dir" : "/home/haeusele/PhD/lingdata/test_data/native",
+"data_dir" : "../test_data/generated",
+"native_dir" : "../test_data/native",
 "sources" : ["lexibank", "SequenceComparison", "correspondence-pattern-data"],
 "ling_types" : ["cognate", "structural", "correspondence"],
 "msa_types" : ["bin", "multi", "catg_bin", "catg_multi", "ambig"],
 "partition_types" : [],
 "glottolog_tree_required" : 0,
-"flat_paths" : 0,
-"github_token" :  "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"}
+"flat_paths" : 0}

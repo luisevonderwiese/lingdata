@@ -52,8 +52,8 @@ def read_config(config_path):
     params.family_split_threshold = json_object["family_split_threshold"]
     params.num_samples = json_object["num_samples"]
 
-    params.data_dir = json_object["data_dir"]
-    params.native_dir = json_object["native_dir"]
+    params.data_dir = os.path.abspath(json_object["data_dir"])
+    params.native_dir = os.path.abspath(json_object["native_dir"])
 
     params.sources = json_object["sources"]
     params.ling_types = json_object["ling_types"]
