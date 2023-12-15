@@ -233,8 +233,6 @@ def generate_samples(data, data_unit):
 
 def generate_paritions(data, data_unit):
     for [model, mode, ambig] in params.partition_types:
-        if ambig and ("ambig" not in row["msa_paths"] or row["msa_paths"]["ambig"] == ""):
-            return
         partition_path = data_unit.partition_path(model, mode, ambig)
         pb.mk_file_dir(partition_path)
         data.write_ng_partition(partition_path, model, mode, ambig, pb)
