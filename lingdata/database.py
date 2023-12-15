@@ -3,9 +3,10 @@ import pandas as pd
 from ete3 import Tree
 import json
 from ast import literal_eval
+from getpass4 import getpass
 
 import lingdata.glottolog as glottolog
-import lingdata.crawler as crawlerpb
+import lingdata.crawler as crawler
 import lingdata.pathbuilder as pb
 import lingdata.params as params
 import lingdata.native_data as native_data
@@ -238,6 +239,7 @@ def generate_paritions(data, data_unit):
         data.write_ng_partition(partition_path, model, mode, ambig, pb)
 
 def update_native():
+    params.github_token = getpass("Please enter github token: ")
     glottolog.crawl()
     crawler.crawl()
 
