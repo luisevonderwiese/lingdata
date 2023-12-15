@@ -1,7 +1,9 @@
-from lingdata.categorical import CategoricalData
-import lingdata.pathbuilder as pb
 import os
 import pandas as pd
+
+from lingdata.categorical import CategoricalData
+import lingdata.pathbuilder as pb
+
 
 
 def add_partition_paths(df, model, mode, ambig):

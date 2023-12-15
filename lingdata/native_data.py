@@ -1,8 +1,7 @@
-
 import os
-
 import json
 import pandas as pd
+
 from lingdata.categorical import CategoricalData
 import lingdata.params as params
 import lingdata.glottolog as glottolog

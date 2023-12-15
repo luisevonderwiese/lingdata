@@ -8,7 +8,7 @@ import shutil
 from lingdata.native_data import CLDFHandler
 from lingdata.categorical import CategoricalData
 import lingdata.glottolog as glottolog
-import lingdata.lingdata as lingdata
+import lingdata.database as database
 import lingdata.params as params
 import lingdata.pathbuilder as pb
 import lingdata.native_data as native_data
@@ -413,7 +413,7 @@ def test_partitioning():
 
 
 config_path = "lingdata_test_config.json"
-lingdata.read_config(config_path)
+database.read_config(config_path)
 
 
 

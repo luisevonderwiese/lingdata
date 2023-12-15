@@ -1,6 +1,6 @@
 import sys
 sys.path.append("..")
-import lingdata.lingdata as lingdata
+import lingdata.database as database
 import lingdata.params as params
 import lingdata.sampling as sampling
 import lingdata.partitioning as partitioning
@@ -11,10 +11,10 @@ import json
 pd.set_option('display.max_rows', None)
 
 config_path = "lingdata_example_config.json"
-lingdata.read_config(config_path)
-lingdata.update_native()
-lingdata.generate_data()
-df = lingdata.data()
+database.read_config(config_path)
+database.update_native()
+database.generate_data()
+df = database.data()
 
 
 with open(config_path, 'r') as openfile:

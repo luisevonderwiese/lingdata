@@ -1,16 +1,16 @@
+import os
+import pandas as pd
+from ete3 import Tree
+import json
+from ast import literal_eval
+
 import lingdata.glottolog as glottolog
-import lingdata.crawler as crawler
-from lingdata.categorical import CategoricalData
+import lingdata.crawler as crawlerpb
 import lingdata.pathbuilder as pb
 import lingdata.params as params
 import lingdata.native_data as native_data
 import lingdata.state_encoding as state_encoding
-import os
-import pandas as pd
-import traceback
-from ete3 import Tree
-import json
-from ast import literal_eval
+
 
 columns = [
             "ds_id",
@@ -69,7 +69,7 @@ def data():
 
 
 
-def build_database(data_units):
+def write_csv(data_units):
     db_df = pd.DataFrame(columns = columns)
     for i, data_unit in enumerate(data_units):
         #general
@@ -139,7 +139,7 @@ def generate_data():
         for source in params.sources:
             for ling_type in params.ling_types:
                 data_units += generate_data_units(ds_id, source, ling_type)
-    build_database(data_units)
+    write_csv(data_units)
 
 
 def generate_data_units(ds_id, source, ling_type):

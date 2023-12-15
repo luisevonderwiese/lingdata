@@ -1,7 +1,8 @@
-from lingdata.categorical import CategoricalData
-import lingdata.pathbuilder as pb
 import os
 import pandas as pd
+
+from lingdata.categorical import CategoricalData
+import lingdata.pathbuilder as pb
 
 
 def add_sampled_msa_paths(df, num_samples):

@@ -1,12 +1,13 @@
-import pandas as pd
-import math
-from github import Github, UnknownObjectException
 import os
 import requests
-from ete3 import Tree
-import numpy as np
 import copy
 import re
+import math
+import pandas as pd
+from ete3 import Tree
+import numpy as np
+from github import Github, UnknownObjectException
+
 import lingdata.params as params
 import lingdata.pathbuilder as pb
 
