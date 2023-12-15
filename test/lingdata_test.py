@@ -1,7 +1,6 @@
 import sys
 sys.path.append("..")
 from Bio.AlignIO.PhylipIO import RelaxedPhylipWriter
-import termplotlib as tpl
 import os
 import shutil
 
@@ -316,7 +315,7 @@ def test_sample():
                 for data, family in data_list:
                     if data is None:
                         continue
-                    for i in range(10):
+                    for i in range(params.num_samples):
                         sample = data.get_random_sample(i)
                         assert(is_sample(data, sample))
     print("========== SAMPLING CORRECTNESS TEST PASSED")
@@ -356,27 +355,6 @@ def test_family_splitting():
                                 full_taxon_idx = full_data.taxon_ids.index(taxon_id)
                                 assert(data.matrix[char_idx][taxon_idx] == full_data.matrix[full_char_idx][full_taxon_idx])
     print("========== FAMILIY SPLITTING CORRECTNESS TEST PASSED")
-
-def plot_counts(counts):
-    fig = tpl.figure()
-    fig.hist(counts, range(len(counts) + 1), orientation="horizontal", force_ascii=True)
-    fig.show()
-
-def test_multistate_ratio():
-    print("========== PRINTING MULTI-STATE DISTRIBUTIONS")
-    for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.sources:
-            for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
-                data_list = handler.get_data(ling_type)
-                for data, family in data_list:
-                    if data is None:
-                        continue
-                    print(data.get_multistate_ratio())
-                    counts = data.get_value_number_counts()
-                    plot_counts(counts)
-
-
 
 def test_partitioning():
     test_dir = "test_temp/"
@@ -429,4 +407,3 @@ test_multi_catg()
 test_sample()
 test_family_splitting()
 test_partitioning()
-test_multistate_ratio()

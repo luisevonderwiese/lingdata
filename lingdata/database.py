@@ -39,13 +39,16 @@ columns = [
 
 converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").split(", ")],
                 "sub_families": lambda x: [] if x == "set()" else [el.strip("'")  for el in x.strip("{}").split(", ")],
-                "msa_paths" : literal_eval}
+                "sampled_msa_paths": lambda x: [] if x == "[]" else [el for el in x.strip("[]").split(", ")],
+                "msa_paths" : literal_eval,
+                "partition_paths" : literal_eval}
 
 def read_config(config_path):
     with open(config_path, 'r') as openfile:
         json_object = json.load(openfile)
     params.size_limit = json_object["size_limit"]
     params.family_split_threshold = json_object["family_split_threshold"]
+    params.num_samples = json_object["num_samples"]
 
     params.data_dir = json_object["data_dir"]
     params.native_dir = json_object["native_dir"]
@@ -54,11 +57,11 @@ def read_config(config_path):
     params.ling_types = json_object["ling_types"]
 
     params.msa_types = json_object["msa_types"]
+    params.partition_types = json_object["partition_types"]
 
     params.glottolog_tree_required = json_object["glottolog_tree_required"]
 
     params.flat_paths = json_object["flat_paths"]
-    params.github_token = json_object["github_token"]
 
 def data():
     metadata_path = pb.metadata_path()
@@ -114,6 +117,22 @@ def write_csv(data_units):
             msa_paths[msa_type] = msa_path
         db_df.at[i, "msa_paths"] = msa_paths
 
+        sampled_msa_paths = []
+        for j in range(params.num_samples):
+            path = data_unit.sample_path(j)
+            if os.path.isfile(path):
+                sampled_msa_paths.append(path)
+        db_df.at[i, "sampled_msa_paths"] = ""
+        db_df.at[i, "sampled_msa_paths"] = sampled_msa_paths
+
+        partition_paths = {}
+        for [model, mode, ambig] in params.partition_types:
+            partition_path = data_unit.partition_path(model, mode, ambig)
+            if os.path.isfile(partition_path):
+                partition_paths[pb.partition_name(model, mode, ambig)] = partition_path
+        db_df.at[i, "partition_paths"] = ""
+        db_df.at[i, "partition_paths"] = partition_paths
+
         #source information
         db_df.at[i, "primary_source"] = data_unit.primary_source
         db_df.at[i, "modification_date"] = data_unit.date
@@ -135,7 +154,7 @@ def generate_data():
         state_encoding.write_charmaps()
     data_units = []
     for ds_id in os.listdir(pb.domain_path("native")):
-        print("Checking data for ", ds_id)
+        print("Checking data for", ds_id)
         for source in params.sources:
             for ling_type in params.ling_types:
                 data_units += generate_data_units(ds_id, source, ling_type)
@@ -192,10 +211,31 @@ def generate_data_units(ds_id, source, ling_type):
         for msa_type in params.msa_types:
             data.write_msa(data_unit.msa_path(msa_type), msa_type)
 
+        generate_samples(data, data_unit)
+        generate_paritions(data, data_unit)
+
         data_units.append(data_unit)
-        print("Data created for ", ds_id, source, ling_type, family)
+        print("Data created for [", ds_id, source, ling_type, family, "]")
 
     return data_units
+
+
+def generate_samples(data, data_unit):
+    for i in range(params.num_samples):
+        path = data_unit.sample_path(i)
+        if i == 0:
+            pb.mk_file_dir(path)
+        sample = data.get_random_sample(i)
+        sample.write_msa(path, "bin")
+
+
+def generate_paritions(data, data_unit):
+    for [model, mode, ambig] in params.partition_types:
+        if ambig and ("ambig" not in row["msa_paths"] or row["msa_paths"]["ambig"] == ""):
+            return
+        partition_path = data_unit.partition_path(model, mode, ambig)
+        pb.mk_file_dir(partition_path)
+        data.write_ng_partition(partition_path, model, mode, ambig, pb)
 
 def update_native():
     glottolog.crawl()
@@ -228,3 +268,9 @@ class DataUnit:
 
     def glottolog_tree_path(self):
         return pb.glottolog_tree_path(self.ds_id, self.source, self.family)
+
+    def sample_path(self, i):
+        return pb.sample_path(self.ds_id, self.source, self.ling_type, self.family, i)
+
+    def partition_path(self, model, mode, ambig):
+        return pb.partition_path(self.ds_id, self.source, self.ling_type, self.family, model, mode, ambig)
