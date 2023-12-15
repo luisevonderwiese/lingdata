@@ -31,12 +31,22 @@ class NativeData:
     def get_data(self, families):
         if self.df is None:
             return []
-        if self.num_languages() > params.family_split_threshold:
+        c = self.num_chars()
+        t = self.num_taxa()
+        print(str(t), "x", str(c))
+        if c > params.max_num_chars:
+            return []
+        if t > params.family_split_threshold:
             return self.split_data(families)
         else:
+            if t > params.max_num_taxa or t < params.min_num_taxa:
+                return []
             return self.full_data()
 
-    def num_languages(self):
+    def num_taxa(self):
+        raise NotImplementedError("Please Implement this method")
+
+    def num_chars(self):
         raise NotImplementedError("Please Implement this method")
 
     def split_data(self, families):
@@ -48,13 +58,19 @@ class NativeData:
 
 class ListData(NativeData):
 
-    def num_languages(self):
+    def num_taxa(self):
         return len(self.df['Language_ID'].unique())
+
+    def num_chars(self):
+        return len(self.df['Char_ID'].unique())
 
     def split_data(self, families):
         cds = []
         for family_id, lang_ids in families.items():
             sub_df =  self.df[self.df['Language_ID'].isin(lang_ids)]
+            num_taxa = len(sub_df['Language_ID'].unique())
+            if num_taxa > params.max_num_taxa or num_taxa < params.min_num_taxa:
+                continue
             cds.append((CategoricalData.from_list_df(sub_df), family_id))
         return cds
 
@@ -64,8 +80,12 @@ class ListData(NativeData):
 
 class MatrixData(NativeData):
 
-    def num_languages(self):
+    def num_taxa(self):
         return len(self.df.columns) - 1
+
+    def num_chars(self):
+        return len(self.df['ID'].unique())
+
 
     def split_data(self, families):
         cds = []
@@ -75,6 +95,9 @@ class MatrixData(NativeData):
                 if column not in ["ID", "FREQUENCY"] and column not in lang_ids:
                     sub_df = sub_df.drop(column, axis=1)
             sub_df = sub_df.drop_duplicates()
+            num_taxa = len(sub_df.columns) - 1
+            if num_taxa > params.max_num_taxa or num_taxa < params.min_num_taxa:
+                continue
             cds.append((CategoricalData.from_matrix_df(sub_df), family_id))
         return cds
 

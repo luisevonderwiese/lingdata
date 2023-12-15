@@ -47,7 +47,8 @@ converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").sp
 def read_config(config_path):
     with open(config_path, 'r') as openfile:
         json_object = json.load(openfile)
-    params.size_limit = json_object["size_limit"]
+    params.max_num_taxa = json_object["max_num_taxa"]
+    params.max_num_chars = json_object["max_num_chars"]
     params.family_split_threshold = json_object["family_split_threshold"]
     params.num_samples = json_object["num_samples"]
 

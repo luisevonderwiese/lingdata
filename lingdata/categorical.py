@@ -6,9 +6,6 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Align import MultipleSeqAlignment
 
 
-import lingdata.params as params
-
-
 symbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G",
          "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
          "Y", "Z", "!", "\"", "#", "$", "%", "&", "\'", "(", ")", "*", "+", ",", "/", ":",
@@ -35,10 +32,6 @@ class CategoricalData:
             raise ValueError("df must have column Value")
         char_ids = list(set(df['Char_ID']))
         taxon_ids = list(set(df['Language_ID']))
-        if len(taxon_ids) < 4:
-            return None
-        if len(taxon_ids) * len(char_ids) > params.size_limit:
-            return None
         char_ids.sort()
         taxon_ids.sort()
         matrix = [[[] for taxon_idx in range(len(taxon_ids))] for char_idx in range(len(char_ids))]
@@ -78,10 +71,6 @@ class CategoricalData:
         taxon_ids = list(df.columns[2:])
         char_ids = list(df["ID"])
         frequencies = list(df["FREQUENCY"])
-        if len(taxon_ids) < 4:
-            return None
-        #if len(taxon_ids) * len(char_ids) > params.size_limit:
-        #    return None
         temp = [ (char_ids[i], frequencies[i]) for i in range(len(char_ids)) ]
         temp.sort()
         char_ids, frequencies = zip(*temp)
