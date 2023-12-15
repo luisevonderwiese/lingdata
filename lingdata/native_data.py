@@ -36,7 +36,7 @@ class NativeData:
         print(str(t), "x", str(c))
         if c > params.max_num_chars:
             return []
-        if t > params.family_split_threshold:
+        if families != {} and t > params.family_split_threshold:
             return self.split_data(families)
         else:
             if t > params.max_num_taxa or t < params.min_num_taxa:

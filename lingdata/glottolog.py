@@ -107,11 +107,10 @@ def extract_full_glottolog_tree():
 def load_families():
     global family_dict
     if family_dict is not None:
-        return
+        return True
     languages_path = os.path.join(pb.domain_path("glottolog"), "languages.csv")
     if not os.path.isfile(languages_path):
-        print("Glottolog files missing, run glottolog.crawl() first")
-        return
+        return False
     languages_df = pd.read_csv(languages_path)
     family_dict = {}
     for index, row in languages_df.iterrows():
@@ -121,21 +120,24 @@ def load_families():
             family_dict[glottocode] = "ISOLATE"
         else:
             family_dict[glottocode] = family_id
+    return True
 
 def load_full_tree():
     global full_tree
     if full_tree is not None:
-        return
+        return True
     if not os.path.isfile(full_tree_path()):
-        print("Glottolog files missing, run glottolog.crawl() first")
-        return
+        return False
     full_tree = Tree(full_tree_path(), format=9)
+    return True
 
 
 
 def get_families(glottocodes):
-    load_families()
+    r = load_families()
     family_ids = set()
+    if not r:
+        return family_ids
     for glottocode in glottocodes:
         if glottocode not in family_dict:
             family_ids.add("UNKNOWN")
@@ -144,8 +146,10 @@ def get_families(glottocodes):
     return family_ids
 
 def split_families(glottocodes):
-    load_families()
+    r = load_families()
     families = {}
+    if not r:
+        return families
     for glottocode, lang_ids in glottocodes.items():
         if glottocode not in family_dict:
             family_id = "UNKNOWN"
@@ -160,7 +164,9 @@ def split_families(glottocodes):
 
 
 def get_tree(glottocodes):
-    load_full_tree()
+    r = load_full_tree()
+    if not r:
+        return None
     tree = copy.deepcopy(full_tree)
     try:
         tree.prune([tree&glottocode for glottocode in glottocodes])
