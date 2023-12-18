@@ -84,7 +84,7 @@ def charmap_path(x):
 
 def clear_data():
     if os.path.isdir(params.data_dir):
-        for el in os.path.listdir(params.data_dir):
+        for el in os.listdir(params.data_dir):
             if el in ["native", "glottolog"]: #do not delete native data if param.data_dir ==  params.native_dir
                 continue
             el_path = os.path.join(params.data_dir, el)
