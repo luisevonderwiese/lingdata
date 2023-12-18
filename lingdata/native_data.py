@@ -81,7 +81,7 @@ class ListData(NativeData):
 class MatrixData(NativeData):
 
     def num_taxa(self):
-        return len(self.df.columns) - 1
+        return len(self.df.columns) - 2
 
     def num_chars(self):
         return len(self.df['ID'].unique())
@@ -95,7 +95,7 @@ class MatrixData(NativeData):
                 if column not in ["ID", "FREQUENCY"] and column not in lang_ids:
                     sub_df = sub_df.drop(column, axis=1)
             sub_df = sub_df.drop_duplicates()
-            num_taxa = len(sub_df.columns) - 1
+            num_taxa = len(sub_df.columns) - 2
             if num_taxa > params.max_num_taxa or num_taxa < params.min_num_taxa:
                 continue
             cds.append((CategoricalData.from_matrix_df(sub_df), family_id))
