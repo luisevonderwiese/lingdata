@@ -16,13 +16,13 @@ class Partitioning:
         #all sites with x <= self.bi_split are assigned to model with x=bi_split, all others to model with x=max_x
         self.partitions_2 = [[] for _ in self.partitions_x]
         max_x = len(self.partitions_x) - 1
-        print("max_x" , str(max_x))
+        #print("max_x" , str(max_x))
         if self.bi_split >= max_x:
             for index_list in self.partitions_x:
                 self.partitions_2[max_x] += index_list
             self.partitions_2[max_x].sort()
-            print(len(self.partitions_2[max_x]))
-            print(0)
+            #print(len(self.partitions_2[max_x]))
+            #print(0)
         else:
             for index_list in self.partitions_x[1:self.bi_split + 1]:
                 self.partitions_2[self.bi_split] += index_list
@@ -30,8 +30,8 @@ class Partitioning:
             for index_list in self.partitions_x[self.bi_split + 1:]:
                 self.partitions_2[max_x] += index_list
             self.partitions_2[max_x].sort()
-            print(len(self.partitions_2[self.bi_split]))
-            print(len(self.partitions_2[max_x]))
+            #print(len(self.partitions_2[self.bi_split]))
+            #print(len(self.partitions_2[max_x]))
 
 
     def get_interval_string(self, sites, joiner = ","):
