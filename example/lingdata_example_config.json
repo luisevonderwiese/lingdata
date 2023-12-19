@@ -8,10 +8,10 @@
 "ling_types" : ["cognate", "structural", "correspondence"],
 "msa_types" : ["bin", "multi", "catg_bin", "catg_multi", "ambig"],
 "partition_types" : [
-  ["MK", "x", 0],
-  ["MK", "2", 0],
-  ["GTR", "x", 0],
-  ["GTR", "2", 0]
+  ["multi", "MK", 0, "x"],
+  ["multi", "MK", 0, "2"],
+  ["ambig", "MK", 0, "x"],
+  ["ambig", "MK", 0, "2"]
 ],
 "glottolog_tree_required" : 1,
 "flat_paths" : 1}

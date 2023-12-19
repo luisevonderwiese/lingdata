@@ -4,3 +4,4 @@ lingdata/__pycache__/
 lingdata.egg-info/*
 lingdata/lingdata.egg-info/
 build/
+test/test_temp/

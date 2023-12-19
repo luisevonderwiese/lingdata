@@ -128,10 +128,10 @@ def write_csv(data_units):
         db_df.at[i, "sampled_msa_paths"] = sampled_msa_paths
 
         partition_paths = {}
-        for [model, mode, ambig] in params.partition_types:
-            partition_path = data_unit.partition_path(model, mode, ambig)
+        for [msa_type, multi_model, gamma, mode] in params.partition_types:
+            partition_path = data_unit.partition_path(msa_type, multi_model, gamma, mode)
             if os.path.isfile(partition_path):
-                partition_paths[pb.partition_name(model, mode, ambig)] = partition_path
+                partition_paths[pb.partition_name(msa_type, multi_model, gamma, mode)] = partition_path
         db_df.at[i, "partition_paths"] = ""
         db_df.at[i, "partition_paths"] = partition_paths
 
@@ -232,10 +232,10 @@ def generate_samples(data, data_unit):
 
 
 def generate_paritions(data, data_unit):
-    for [model, mode, ambig] in params.partition_types:
-        partition_path = data_unit.partition_path(model, mode, ambig)
+    for [msa_type, multi_model, gamma, mode] in params.partition_types:
+        partition_path = data_unit.partition_path(msa_type, multi_model, gamma, mode)
         pb.mk_file_dir(partition_path)
-        data.write_ng_partition(partition_path, model, mode, ambig, pb)
+        data.write_partitioning(partition_path, msa_type, multi_model, gamma, mode)
 
 def update_native():
     params.github_token = getpass("Please enter github token: ")
@@ -273,5 +273,5 @@ class DataUnit:
     def sample_path(self, i):
         return pb.sample_path(self.ds_id, self.source, self.ling_type, self.family, i)
 
-    def partition_path(self, model, mode, ambig):
-        return pb.partition_path(self.ds_id, self.source, self.ling_type, self.family, model, mode, ambig)
+    def partition_path(self, msa_type, multi_model, gamma, mode):
+        return pb.partition_path(self.ds_id, self.source, self.ling_type, self.family, msa_type, multi_model, gamma, mode)

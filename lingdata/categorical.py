@@ -5,6 +5,8 @@ from Bio.AlignIO.PhylipIO import RelaxedPhylipWriter
 from Bio.SeqRecord import SeqRecord
 from Bio.Align import MultipleSeqAlignment
 
+from lingdata.partitioning import Partitioning
+
 
 symbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G",
          "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
@@ -20,6 +22,7 @@ class CategoricalData:
         self.char_ids = char_ids
         #store transposed because easier for converting
         self.matrix = matrix #char_id index, taxon_id index, values
+        self.partitioning =  None #created if paritionings are requested
 
 
     @classmethod
@@ -384,71 +387,7 @@ class CategoricalData:
         return len(self.get_value_number_counts()) > 2
 
 
-
-    def get_interval_string(self, sites, joiner = ","):
-        if len(sites) == 0:
-            return ""
-        intervals = []
-        interval_begin = sites[0]
-        cursor = sites[0]
-        for site in sites[1:]:
-            if site != cursor + 1:
-                if cursor ==  interval_begin:
-                    intervals.append(str(interval_begin))
-                else:
-                    intervals.append(str(interval_begin) + "-" + str(cursor))
-                interval_begin = site
-            cursor = site
-        if cursor ==  interval_begin:
-            intervals.append(str(interval_begin))
-        else:
-            intervals.append(str(interval_begin) + "-" + str(cursor))
-        return joiner.join(intervals)
-
-
-    def write_ng_partition(self, path, multi_model, mode, ambig = False, pb = None):
-        if mode not in ["2", "x"]:
-            print("Mode for paritioning must be 2 or x not " + mode)
-            return False
-        partitions = []
-        for char_idx in range(self.num_chars()):
-            x  = len(self.get_possible_values(char_idx))
-            partition_idx = max(0, x - 2)
-            if mode == "2":
-                partition_idx = min(partition_idx, 1)
-            while(len(partitions) < partition_idx + 1):
-                partitions.append([])
-            partitions[partition_idx].append(char_idx + 1)
-        partition_strings = {}
-        interval_string = self.get_interval_string(partitions[0], ",")
-        if interval_string != "":
-            if ambig:
-                model = "MULTI2_" + multi_model + "+M{" + pb.charmap_path(2) + "}"
-            else:
-                model = "BIN"
-            partition_strings[model] = interval_string
-        if mode == "x":
-            for i in range(1, len(partitions)):
-                x = i + 2
-                if ambig:
-                    model = "MULTI" + str(x) + "_" + multi_model + "+M{" + pb.charmap_path(x) + "}"
-                else:
-                    model = "MULTI" + str(x) + "_" + multi_model
-                interval_string = self.get_interval_string(partitions[i], ",")
-                if interval_string != "":
-                    partition_strings[model] = interval_string
-        elif len(partitions) > 1 and len(partitions[1]) > 0:
-            x = self.max_values()
-            if ambig:
-                model = "MULTI" + str(x) + "_" + multi_model + "+M{" + pb.charmap_path(x) + "}"
-            else:
-                model = "MULTI" + str(x) + "_" + multi_model
-            interval_string = self.get_interval_string(partitions[1], ",")
-            if interval_string != "":
-                partition_strings[model] = interval_string
-        with open(path, "w+") as part_file:
-            i = 1
-            for (model, intervals) in partition_strings.items():
-                part_file.write(model + ",  p" + str(i) + "=" + intervals + "\n")
-                i += 1
-        return True
+    def write_partitioning(self, path, msa_type, multi_model, gamma, mode):
+        if self.partitioning is None:
+            self.partitioning = Partitioning([len(self.get_possible_values(char_idx)) for char_idx in range(self.num_chars())])
+        self.partitioning.write(path, msa_type, multi_model, gamma, mode)

@@ -65,13 +65,14 @@ def msa_path(ds_id, source, ling_type, family, msa_type):
         name = msa_type + ".phy"
     return os.path.join(family_path("msa", ds_id, source, ling_type, family), name)
 
-def partition_path(ds_id, source, ling_type, family, multi_model, mode, ambig):
-    return os.path.join(family_path("partition", ds_id, source, ling_type, family), partition_name(multi_model, mode, ambig) + ".part")
+def partition_path(ds_id, source, ling_type, family, msa_type, multi_model, gamma, mode):
+    return os.path.join(family_path("partition", ds_id, source, ling_type, family), partition_name(msa_type, multi_model, gamma, mode) + ".part")
 
-def partition_name(multi_model, mode, ambig):
-    name = multi_model + mode
-    if ambig:
-        name += "+M"
+def partition_name(msa_type, multi_model, gamma, mode):
+    name = msa_type + "_" + multi_model
+    if gamma:
+        name += "+G"
+    name += "_" + mode
     return name
 
 def sample_path(ds_id, source, ling_type, family, idx):

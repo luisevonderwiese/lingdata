@@ -373,12 +373,12 @@ def test_partitioning():
                         continue
                     res = data.write_msa(msa_path, "multi")
                     if res:
-                        data.write_ng_partition(new_path, "GTR", mode = "2")
+                        data.write_partitioning(new_path, "multi", "GTR", False, "2")
                         partitioning_reference.create_ng_partition(msa_path, old_path, multi_model = "GTR", complete = False)
                         if os.path.isfile(old_path):
                             assert(equal_files(new_path, old_path))
                             os.remove(old_path)
-                        data.write_ng_partition(new_path, "GTR", mode = "x")
+                        data.write_partitioning(new_path, "multi", "GTR", False, "x")
                         partitioning_reference.create_ng_partition(msa_path, old_path, multi_model = "GTR", complete = True)
                         if os.path.isfile(old_path):
                             assert(equal_files(new_path, old_path))
