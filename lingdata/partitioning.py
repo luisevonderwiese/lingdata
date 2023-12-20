@@ -7,15 +7,18 @@ class Partitioning:
     def __init__(self, num_possible_values):
         self.partitions_x = []
         for char_idx, num in enumerate(num_possible_values):
-            # x corresponds to number of binary sites required and to x for multi_model, supposed to be 1 for chars without values
-            x  = max(1, num)
+            # x in the sense of MULTIx_..., MULTI2 corresponds to bin, MULTI1 not relevant as not informative, we assign it to BIN
+            x  = max(2, num)
             while(len(self.partitions_x) < x + 1):
                 self.partitions_x.append([])
             self.partitions_x[x].append(char_idx + 1) #+1 because raxml-ng partitions index from 1
 
         #all sites with x <= self.bi_split are assigned to model with x=bi_split, all others to model with x=max_x
+        assert(self.partitions_x[0] == [])
+        assert(self.partitions_x[1] == [])
         self.partitions_2 = [[] for _ in self.partitions_x]
         max_x = len(self.partitions_x) - 1
+        assert(max_x >= 3)
         #print("max_x" , str(max_x))
         if self.bi_split >= max_x:
             for index_list in self.partitions_x:
@@ -55,9 +58,10 @@ class Partitioning:
         return joiner.join(intervals)
 
     def get_part_model(self, msa_type, multi_model, gamma, x):
-        #if msa_type == "multi" and x <= 2:
-        #    model = "BIN"
-        model = "MULTI" + str(x) + "_" + multi_model
+        if x == 2:
+            model = "BIN"
+        else:
+            model = "MULTI" + str(x) + "_" + multi_model
         if msa_type == "ambig":
             model += "+M{" + pb.charmap_path(x) + "}"
         if gamma:
@@ -74,10 +78,10 @@ class Partitioning:
             print("Illegal partition mode", mode)
             return False
         partition_strings = {}
-        for (x, partition) in enumerate(partitions_to_consider[1:]):
+        for (x, partition) in enumerate(partitions_to_consider):
             interval_string = self.get_interval_string(partition, ",")
-            model = self.get_part_model(msa_type, multi_model, gamma, x)
             if interval_string != "":
+                model = self.get_part_model(msa_type, multi_model, gamma, x)
                 partition_strings[model] = interval_string
         with open(path, "w+") as part_file:
             i = 1
