@@ -18,7 +18,7 @@ class Partitioning:
         assert(self.partitions_x[1] == [])
         self.partitions_2 = [[] for _ in self.partitions_x]
         max_x = len(self.partitions_x) - 1
-        assert(max_x >= 3)
+        assert(max_x >= 2)
         #print("max_x" , str(max_x))
         if self.bi_split >= max_x:
             for index_list in self.partitions_x:
