@@ -44,26 +44,60 @@ converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").sp
                 "msa_paths" : literal_eval,
                 "partition_paths" : literal_eval}
 
+all_sources = ["lexibank", "SequenceComparison", "correspondence-pattern-data"]
+all_ling_types = ["cognate", "structural", "correspondence"]
+all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig"]
+
 def read_config(config_path):
     with open(config_path, 'r') as openfile:
         json_object = json.load(openfile)
     params.max_num_taxa = json_object["max_num_taxa"]
+    if not isinstance(params.max_num_taxa, int):
+        raise Exception("Malformed config: max_num_taxa must be an integer")
     params.max_num_chars = json_object["max_num_chars"]
+    if not isinstance(params.max_num_chars, int):
+        raise Exception("Malformed config: max_num_chars must be an integer")
     params.family_split_threshold = json_object["family_split_threshold"]
+    if not isinstance(params.family_split_threshold, int):
+        raise Exception("Malformed config: family_split_threshold must be an integer")
     params.num_samples = json_object["num_samples"]
+    if not isinstance(params.num_samples, int):
+        raise Exception("Malformed config: num_samples must be an integer")
 
     params.data_dir = os.path.abspath(json_object["data_dir"])
     params.native_dir = os.path.abspath(json_object["native_dir"])
 
     params.sources = json_object["sources"]
+    if not type(params.sources) is list:
+        raise Exception("Malformed config: sources must be a list")
+    for source in params.sources:
+        if source not in all_sources:
+            raise Exception("Malformed config: invalid source " + source)
     params.ling_types = json_object["ling_types"]
-
+    if not type(params.ling_types) is list:
+        raise Exception("Malformed config: ling_types must be a list")
+    for ling_type in params.ling_types:
+        if ling_type not in all_ling_types:
+            raise Exception("Malformed config: invalid ling_type " + ling_type)
     params.msa_types = json_object["msa_types"]
+    if not type(params.msa_types) is list:
+        raise Exception("Malformed config: msa_types must be a list")
+    for msa_type in params.msa_types:
+        if msa_type not in all_msa_types:
+            raise Exception("Malformed config: invalid msa_type " + msa_type)
     params.partition_types = json_object["partition_types"]
+    if not type(params.partition_types) is list:
+        raise Exception("Malformed config: partition_types must be a list")
+    for partition_type in params.partition_types:
+        if partition_type[0] not in all_msa_types or partition_type[1] not in ["MK", "GTR"] or partition_type[2] not in [0, 1] or partition_type[3] not in ["2", "x"]:
+            raise Exception("Malformed config: invalid partition_type " + partition_type)
 
     params.glottolog_tree_required = json_object["glottolog_tree_required"]
-
+    if not params.glottolog_tree_required in [0, 1]:
+        raise Exception("Malformed config: glottolog_tree_required must be 0 or 1")
     params.flat_paths = json_object["flat_paths"]
+    if not params.flat_paths in [0, 1]:
+        raise Exception("Malformed config: flat_paths must be 0 or 1")
 
 def data():
     metadata_path = pb.metadata_path()
