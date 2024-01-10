@@ -194,8 +194,8 @@ def generate_data_units(ds_id, source, ling_type):
             if glottolog_tree is not None:
                 pb.mk_file_dir(tree_path)
                 glottolog_tree.write(outfile = tree_path, format=9)
-            elif params.glottolog_tree_required:
-                continue
+        if params.glottolog_tree_required and not os.path.isfile(tree_path):
+            continue
 
         #families
         if family == "full":
