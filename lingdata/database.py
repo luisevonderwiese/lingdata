@@ -191,9 +191,13 @@ def generate_data():
         state_encoding.write_charmaps()
     data_units = []
     for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.sources:
-            for ling_type in params.ling_types:
-                print(colored("Checking data for [ " + ds_id * " " + source + " " + ling_type + " ]", "red"))
+        for source in os.listdir(os.path.join(pb.domain_path("native"), ds_id)):
+            if not source in params.sources:
+                continue
+            for ling_type in params.ling_types_for_source[source]:
+                if not ling_type in params.ling_types:
+                    continue
+                print(colored("\nChecking data for [ " + ds_id + " " + source + " " + ling_type + " ]", "white"))
                 data_units += generate_data_units(ds_id, source, ling_type)
     write_csv(data_units)
 
@@ -230,7 +234,7 @@ def generate_data_units(ds_id, source, ling_type):
                 pb.mk_file_dir(tree_path)
                 glottolog_tree.write(outfile = tree_path, format=9)
         if params.glottolog_tree_required and not os.path.isfile(tree_path):
-            print("Missing Glottolog Tree")
+            print(colored("Missing Glottolog Tree", "red"))
             continue
 
         #families

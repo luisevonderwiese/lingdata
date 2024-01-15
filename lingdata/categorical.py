@@ -4,6 +4,7 @@ from Bio import AlignIO
 from Bio.AlignIO.PhylipIO import RelaxedPhylipWriter
 from Bio.SeqRecord import SeqRecord
 from Bio.Align import MultipleSeqAlignment
+from termcolor import colored
 
 from lingdata.partitioning import Partitioning
 
@@ -221,21 +222,21 @@ class CategoricalData:
         if msa_type == "ambig":
             max_values = self.max_values()
             if pow(2, max_values) > len(symbols):
-                print("ambig MSA cannot be created for dataset with", str(max_values), "max_values")
+                print(colored("ambig MSA cannot be created for dataset with " +  str(max_values) + " max_values", "yellow"))
                 return None
             if max_values < 2:
-                print("ambig MSA cannot be created for dataset with", str(max_values), "< 2 max_values")
+                print(colored("ambig MSA cannot be created for dataset with " +  str(max_values) +  " < 2 max_values", "yellow"))
                 return None
         if msa_type == "multi":
             max_values = self.max_values()
             if max_values > len(symbols):
-                print("multi MSA cannot be created for dataset with", str(max_values), "> 64 max_values")
+                print(colored("multi MSA cannot be created for dataset with " + str(max_values) + " > 64 max_values", "yellow"))
                 return None
             if max_values < 2:
-                print("multi MSA cannot be created for dataset with", str(max_values), "< 2 max_values")
+                print(colored("multi MSA cannot be created for dataset with " + str(max_values) + " < 2 max_values", "yellow"))
                 return None
             if self.is_mutlistate():
-                print("multi MSA cannot be created for multistate dataset")
+                print(colored("multi MSA cannot be created for multistate dataset", "yellow"))
                 return None
 
         sequences = ["" for i in range(self.num_taxa())]
@@ -320,10 +321,10 @@ class CategoricalData:
         cols = []
         max_values = self.max_values()
         if max_values > len(symbols):
-            print("catg_multi MSA cannot be created for dataset with", str(max_values), "> 64 max_values")
+            print(colored("catg_multi MSA cannot be created for dataset with " + str(max_values) + " > 64 max_values", "yellow"))
             return False
         if max_values < 2:
-            print("catg_multi MSA cannot be created for dataset with", str(max_values), "< 2 max_values")
+            print(colored("catg_multi MSA cannot be created for dataset with " + str(max_values) + " < 2 max_values", "yellow"))
             return False
         for char_idx in range(self.num_chars()):
             possible_values = self.get_possible_values(char_idx)
