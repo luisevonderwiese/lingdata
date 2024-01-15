@@ -30,16 +30,23 @@ class NativeData:
 
     def get_data(self, families):
         if self.df is None:
+            print("Native data incomplete")
             return []
         c = self.num_chars()
         t = self.num_taxa()
         print(str(t), "x", str(c))
         if c > params.max_num_chars:
+            print("Too many chars:", str(num_chars))
             return []
         if families != {} and t > params.family_split_threshold:
+            print("Splitting families (", str(num_taxa), ")" )
             return self.split_data(families)
         else:
-            if t > params.max_num_taxa or t < params.min_num_taxa:
+            if t > params.max_num_taxa:
+                print("Too many taxa:", str(num_taxa))
+                return []
+            if t < params.min_num_taxa:
+                print("Too few taxa:", str(num_taxa))
                 return []
             return self.full_data()
 
@@ -69,7 +76,13 @@ class ListData(NativeData):
         for family_id, lang_ids in families.items():
             sub_df =  self.df[self.df['Language_ID'].isin(lang_ids)]
             num_taxa = len(sub_df['Language_ID'].unique())
-            if num_taxa > params.max_num_taxa or num_taxa < params.min_num_taxa:
+            if num_taxa > params.max_num_taxa:
+                print(family_id)
+                print("Too many taxa:", str(num_taxa))
+                continue
+            if num_taxa < params.min_num_taxa:
+                print(family_id)
+                print("Too few taxa:", str(num_taxa))
                 continue
             cds.append((CategoricalData.from_list_df(sub_df), family_id))
         return cds
@@ -96,7 +109,13 @@ class MatrixData(NativeData):
                     sub_df = sub_df.drop(column, axis=1)
             sub_df = sub_df.drop_duplicates()
             num_taxa = len(sub_df.columns) - 2
-            if num_taxa > params.max_num_taxa or num_taxa < params.min_num_taxa:
+            if num_taxa > params.max_num_taxa:
+                print(family_id)
+                print("Too many taxa:", str(num_taxa))
+                continue
+            if num_taxa < params.min_num_taxa:
+                print(family_id)
+                print("Too few taxa:", str(num_taxa))
                 continue
             cds.append((CategoricalData.from_matrix_df(sub_df), family_id))
         return cds
@@ -110,15 +129,19 @@ class CLDFCognateData(ListData):
         self.df = None
         forms_path = os.path.join(source_path, "forms.csv")
         if not os.path.isfile(forms_path):
+            print("Missing forms.csv")
             return
         cognates_path = os.path.join(source_path, "cognates.csv")
         if not os.path.isfile(cognates_path):
+            print("Missing cognates.csv")
             return
         forms_df = pd.read_csv(forms_path)
         if len(forms_df.index) == 0:
+            print("Empty forms.csv")
             return
         cognates_df = pd.read_csv(cognates_path)
         if len(cognates_df.index) == 0:
+            print("Emptpy cognates.csv")
             return
 
         forms_df = drop_columns_except(forms_df, ["ID", "Language_ID", "Parameter_ID"])
@@ -144,9 +167,11 @@ class CLDFStrcuturalData(ListData):
         self.df = None
         values_path = os.path.join(source_path, "values.csv")
         if not os.path.isfile(values_path):
+            print("Missing values.csv")
             return
         self.df = pd.read_csv(values_path)
         if len(self.df.index) == 0:
+            print("Empty values.csv")
             return
         self.df = drop_columns_except(self.df, ["Language_ID", "Parameter_ID", "Value"])
         self.df = self.df.rename(columns={'Parameter_ID': 'Char_ID'})
@@ -166,6 +191,7 @@ class CorrespondenceCognateData(ListData):
         self.df = None
         path = os.path.join(source_path, "trimmed.tsv")
         if not os.path.isfile(path):
+            print("Missing trimmed.tsv")
             return
         self.df = pd.read_table(path)
         self.df = drop_columns_except(self.df, ['DOCULECT', 'CONCEPT', 'COGID'])
@@ -180,6 +206,7 @@ class CorrespondenceCorrespondenceData(MatrixData):
         self.df = None
         path = os.path.join(source_path, "correspondence.tsv")
         if not os.path.isfile(path):
+            print("Missing correspondence.tsv")
             return None
         self.df = pd.read_table(path)
         self.df = self.df.drop("STRUCTURE", axis=1)
@@ -329,7 +356,7 @@ class CorrespondencePatternsHandler(Handler):
             return None
         df = pd.read_table(path)
         if len(df.index) == 0:
-            return ([], False)
+            return None
         df = drop_columns_except(df, ["DOCULECT", "GLOTTOCODE"])
         df = df.drop_duplicates()
         df = df.rename(columns={'DOCULECT': 'ID'})

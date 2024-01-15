@@ -4,6 +4,7 @@ from ete3 import Tree
 import json
 from ast import literal_eval
 from getpass4 import getpass
+from termcolor import colored
 
 import lingdata.glottolog as glottolog
 import lingdata.crawler as crawler
@@ -190,9 +191,9 @@ def generate_data():
         state_encoding.write_charmaps()
     data_units = []
     for ds_id in os.listdir(pb.domain_path("native")):
-        print("Checking data for", ds_id)
         for source in params.sources:
             for ling_type in params.ling_types:
+                print(colored("Checking data for [ " + ds_id * " " + source + " " + ling_type + " ]", "red"))
                 data_units += generate_data_units(ds_id, source, ling_type)
     write_csv(data_units)
 
@@ -229,6 +230,7 @@ def generate_data_units(ds_id, source, ling_type):
                 pb.mk_file_dir(tree_path)
                 glottolog_tree.write(outfile = tree_path, format=9)
         if params.glottolog_tree_required and not os.path.isfile(tree_path):
+            print("Missing Glottolog Tree")
             continue
 
         #families
@@ -251,7 +253,7 @@ def generate_data_units(ds_id, source, ling_type):
         generate_paritions(data, data_unit)
 
         data_units.append(data_unit)
-        print("Data created for [", ds_id, source, ling_type, family, "]")
+        print(colored("Data created for [ " + ds_id + " " + source + " " + ling_type + " " + family + " ]", "green"))
 
     return data_units
 

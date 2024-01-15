@@ -20,7 +20,6 @@ See `example/lingdata_example.py`
 ## Config
 For an example see `example/lingdata_example_config.json`
 | parameter name | explanation |
-|--- | --- |
 | `max_num_taxa` | maximum number of languages such that the dataset is added to the compiled database |
 | `max_num_chars` | maximum number of concepts such that the dataset is added to the compiled database |
 | `family_split_threshold` | maximum number of languages such that the dataset is added to the compiled database without being split in subfamilies |

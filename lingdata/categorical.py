@@ -220,13 +220,22 @@ class CategoricalData:
             return None
         if msa_type == "ambig":
             max_values = self.max_values()
-            if pow(2, max_values) > len(symbols) or max_values == 1:
+            if pow(2, max_values) > len(symbols):
+                print("ambig MSA cannot be created for dataset with", str(max_values), "max_values")
+                return None
+            if max_values < 2:
+                print("ambig MSA cannot be created for dataset with", str(max_values), "< 2 max_values")
                 return None
         if msa_type == "multi":
             max_values = self.max_values()
-            if max_values > len(symbols) or max_values < 2:
+            if max_values > len(symbols):
+                print("multi MSA cannot be created for dataset with", str(max_values), "> 64 max_values")
+                return None
+            if max_values < 2:
+                print("multi MSA cannot be created for dataset with", str(max_values), "< 2 max_values")
                 return None
             if self.is_mutlistate():
+                print("multi MSA cannot be created for multistate dataset")
                 return None
 
         sequences = ["" for i in range(self.num_taxa())]
@@ -310,7 +319,11 @@ class CategoricalData:
         probs = []
         cols = []
         max_values = self.max_values()
-        if max_values > len(symbols) or max_values < 2:
+        if max_values > len(symbols):
+            print("catg_multi MSA cannot be created for dataset with", str(max_values), "> 64 max_values")
+            return False
+        if max_values < 2:
+            print("catg_multi MSA cannot be created for dataset with", str(max_values), "< 2 max_values")
             return False
         for char_idx in range(self.num_chars()):
             possible_values = self.get_possible_values(char_idx)
