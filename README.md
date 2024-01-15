@@ -15,17 +15,32 @@ See `example/lingdata_example.py`
 
 ## Usage from Command Line
 
+### Database
+```
+lingdata --download -c example/lingdata_example_config.json
+lingdata --compile -c example/lingdata_example_config.json  
+
+```
+
+
+### Generating MSAs / character matrices
+```
+lingdata --generate -i conversion_example_data/cldf/ -l cognate -o conversion_example_data/msa/bin.phy  -m bin
+```
+
+
 
 
 ## Config
 For an example see `example/lingdata_example_config.json`
 | parameter name | explanation |
+| --- | --- |
 | `max_num_taxa` | maximum number of languages such that the dataset is added to the compiled database |
 | `max_num_chars` | maximum number of concepts such that the dataset is added to the compiled database |
 | `family_split_threshold` | maximum number of languages such that the dataset is added to the compiled database without being split in subfamilies |
 | `num_samples` | number of sampled binary MSAs in the compiled database (see Paper) |
-| `data_dir` | directory where generated data is stored |
-| `native_dir` | directory where data downloaded from sources is stored |
+| `data_dir` | directory where generated data is stored <br>(absolute or relative to location of config file)|
+| `native_dir` | directory where data downloaded from sources is stored <br>(absolute or relative to location of config file)|
 | `sources` | sources from which data is added to the compiled database <br>Supported sources: `"lexibank"` (<https://github.com/lexibank>), `"SequenceComparison"` (<https://github.com/SequenceComparison>), `"correspondence-pattern-data"` (<https://github.com/lingpy/correspondence-pattern-data>)<sup>1</sup> |
 | `ling_types` | Datasets of the provided linguistic data type are added to the compiled database <br>Supported types: `"cognate"`, `"structural"` (morpho-syntactic or morpho-phonological data), `"correspondence"` (sound correspondence patterns) |
 | `msa_types` | MSA (character matrix) types contained in the compiled database <br>Supported types: `"bin"` (binary), `"multi"` (multi-valued), `"catg_bin"` (probabilistic binary), `"catg_multi"` (probabilistic multi-valued), `"ambig"` (with user defined state encoding)<sup>2</sup> |
@@ -44,7 +59,6 @@ Each of the listed directories (except from `native_dir/glottolog/` and `data_di
 | --- | --- |
 | `native_dir/glottolog/` | List of languages and full gold standard tree from glottolog |
 | `native_dir/native/` | Data downloaded from sources (in CLDF format mainly) |
-| --- | --- |
 | `data_dir/lingdata.csv` | Actual database file containing metadata and paths |
 | `data_dir/categorical/` | Categorical matrices (required as an intermediate step for creating MSAs / character matrices)
 | `data_dir/glottolog_trees/` | Glottolog reference trees pruned from the full tree |
