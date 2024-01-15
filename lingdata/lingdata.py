@@ -2,7 +2,7 @@ import argparse
 import sys
 
 import lingdata.database as database
-import lingdata.converter as converter
+import lingdata.generator as generator
 
 
 def print_header():
@@ -83,9 +83,9 @@ def main():
     args = parser.parse_args()
     if args.download:
         database.read_config(args.config)
-        database.update_native()
+        database.download()
     elif args.compile:
         database.read_config(args.config)
-        database.generate_data()
+        database.compile()
     elif args.generate:
-        converter.cldf_to_msa(args.input, args.ling_type, args.output, args.msa_type)
+        generator.cldf_to_msa(args.input, args.ling_type, args.output, args.msa_type)

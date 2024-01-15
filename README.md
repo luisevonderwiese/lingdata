@@ -16,14 +16,20 @@ See `example/lingdata_example.py`
 ## Usage from Command Line
 
 ### Database
+Download native data from sources:
 ```
-lingdata --download -c example/lingdata_example_config.json
+lingdata --download -c example/lingdata_example_config.json 
+
+```
+Complile Database (includes generating all related files)
+
+```
 lingdata --compile -c example/lingdata_example_config.json  
 
 ```
 
 
-### Generating MSAs / character matrices
+### Generating MSAs
 ```
 lingdata --generate -i conversion_example_data/cldf/ -l cognate -o conversion_example_data/msa/bin.phy  -m bin
 ```
@@ -57,9 +63,9 @@ For an example see `example/lingdata_example_config.json`
 Each of the listed directories (except from `native_dir/glottolog/` and `data_dir/charmaps/`) contains a subdirectory with the respective files for each dataset. All paths are provided in the respective columns of `data_dir/lingdata.csv`.
 | directory | contains |
 | --- | --- |
-| `native_dir/glottolog/` | List of languages and full gold standard tree from glottolog |
+| `native_dir/glottolog/` | List of languages and full gold standard tree from glottolog|
 | `native_dir/native/` | Data downloaded from sources (in CLDF format mainly) |
-| `data_dir/lingdata.csv` | Actual database file containing metadata and paths |
+| `data_dir/lingdata.csv` | Actual database file containing metadata and paths (accessed when calling `db.data()` from python)|
 | `data_dir/categorical/` | Categorical matrices (required as an intermediate step for creating MSAs / character matrices)
 | `data_dir/glottolog_trees/` | Glottolog reference trees pruned from the full tree |
 | `data_dir/msa/` | Different types of MSAs / character matrices |

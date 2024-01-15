@@ -185,10 +185,10 @@ def write_csv(data_units):
 
 
 
-def generate_data():
+def compile():
     pb.clear_data()
     if not (os.path.isdir(pb.domain_path("glottolog")) and os.path.isdir(pb.domain_path("native"))):
-        print("Native data does not exist, run update_native() before")
+        print(colored("Native data does not exist, run download before", "red"))
         return
 
     if "ambig" in params.msa_types:
@@ -202,11 +202,12 @@ def generate_data():
                 if not ling_type in params.ling_types:
                     continue
                 print(colored("\nChecking data for [ " + ds_id + " " + source + " " + ling_type + " ]", "white"))
-                data_units += generate_data_units(ds_id, source, ling_type)
+                data_units += compile_data_units(ds_id, source, ling_type)
     write_csv(data_units)
+    print(colored("Compiling finished. Data saved to " + params.data_dir, "green"))
 
 
-def generate_data_units(ds_id, source, ling_type):
+def compile_data_units(ds_id, source, ling_type):
     handler = native_data.get_handler(ds_id, source)
     data_list = handler.get_data(ling_type)
     data_units = []
@@ -257,8 +258,8 @@ def generate_data_units(ds_id, source, ling_type):
         for msa_type in params.msa_types:
             data.write_msa(data_unit.msa_path(msa_type), msa_type)
 
-        generate_samples(data, data_unit)
-        generate_paritions(data, data_unit)
+        compile_samples(data, data_unit)
+        compile_paritions(data, data_unit)
 
         data_units.append(data_unit)
         print(colored("Data created for [ " + ds_id + " " + source + " " + ling_type + " " + family + " ]", "green"))
@@ -266,7 +267,7 @@ def generate_data_units(ds_id, source, ling_type):
     return data_units
 
 
-def generate_samples(data, data_unit):
+def compile_samples(data, data_unit):
     for i in range(params.num_samples):
         path = data_unit.sample_path(i)
         if i == 0:
@@ -275,16 +276,17 @@ def generate_samples(data, data_unit):
         sample.write_msa(path, "bin")
 
 
-def generate_paritions(data, data_unit):
+def compile_paritions(data, data_unit):
     for [msa_type, multi_model, gamma, mode] in params.partition_types:
         partition_path = data_unit.partition_path(msa_type, multi_model, gamma, mode)
         pb.mk_file_dir(partition_path)
         data.write_partitioning(partition_path, msa_type, multi_model, gamma, mode)
 
-def update_native():
+def download():
     params.github_token = getpass("Please enter github token: ")
     glottolog.crawl()
     crawler.crawl()
+    print(colored("Download finished. Data saved to " + params.native_dir, "green"))
 
 
 
