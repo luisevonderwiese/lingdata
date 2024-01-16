@@ -30,7 +30,6 @@ full_tree = None
 def download_file(repo, file_name, sha):
     download_path = os.path.join(pb.domain_path("glottolog"), file_name)
     if os.path.isfile(download_path):
-        print(file_name + " exists")
         return True
     try:
         url = repo.get_contents(os.path.join("cldf", file_name), sha).download_url
@@ -55,6 +54,7 @@ def crawl():
             if json_data["sha"] == sha:
                 print(colored("Glottolog files up to date", "yellow"))
             return
+            pb.rm_this_dir(glottolog_path)
     pb.mk_this_dir(glottolog_path)
     meta_dict = {"sha" : sha}
     with open(os.path.join(glottolog_path, "meta.json"), 'w+') as outfile:
