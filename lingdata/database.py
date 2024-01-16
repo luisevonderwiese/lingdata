@@ -68,7 +68,8 @@ def read_config(config_path):
 
     config_dir = os.path.dirname(config_path)
     cur_cwd = os.getcwd()
-    os.chdir(config_dir)
+    if config_dir != "":
+        os.chdir(config_dir)
     params.data_dir = os.path.abspath(json_object["data_dir"])
     params.native_dir = os.path.abspath(json_object["native_dir"])
     os.chdir(cur_cwd)
