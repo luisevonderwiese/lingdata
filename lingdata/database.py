@@ -5,6 +5,7 @@ import json
 from ast import literal_eval
 from getpass4 import getpass
 from termcolor import colored
+from datetime import datetime
 
 import lingdata.glottolog as glottolog
 import lingdata.crawler as crawler
@@ -103,6 +104,11 @@ def read_config(config_path):
     params.flat_paths = json_object["flat_paths"]
     if not params.flat_paths in [0, 1]:
         raise Exception("Malformed config: flat_paths must be 0 or 1")
+
+    try:
+        params.download_cutoff = datetime.fromisoformat(json_object["download_cutoff"])
+    except:
+        raise Exception("Malformed config: download_cutoff must be in isoformat YYYY-MM-DDThh:mm:ss±hh:mm")
 
 def data():
     metadata_path = pb.metadata_path()

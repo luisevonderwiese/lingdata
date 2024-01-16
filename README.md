@@ -18,14 +18,12 @@ See `example/lingdata_example.py`
 ### Database
 Download native data from sources:
 ```
-lingdata --download -c example/lingdata_example_config.json 
-
+lingdata --download -c example/lingdata_example_config.json
 ```
 Complile Database (includes generating all related files)
 
 ```
 lingdata --compile -c example/lingdata_example_config.json  
-
 ```
 
 
@@ -53,6 +51,7 @@ For an example see `example/lingdata_example_config.json`
 | `partition_types` | [Partitionings]() contained in the compiled database <br>Partition type specified as [msa_type, multi_model, gamma, mode] where <br>msa_type: valid msa_type (see above) <br>multi_model: `"MK"`, `"GTR"` ([details](https://github.com/amkozlov/raxml-ng/wiki/Input-data#evolutionary-model)) <br>gamma: `0`, `1` ([details](https://github.com/amkozlov/raxml-ng/wiki/Input-data#evolutionary-model)) <br>mode: `"2"`, `"x"` (`"2"`: two partitions only (characteristics with <= 2 / > 2 values), "x"`: One partition for each number of values per characteristic)|
 | `glottolog_tree_required` | `1`: only datasets with existing glottolog tree must be added to the compiled database <br>`0`: datasets are added to the compiled database no matter whether a glottolog tree exists or not |
 | flat_paths | `1`: data is stored in a directory structure with one level only <br>`0`: data is stored in hierarchical structure with one level for each ds_id, source, ling_type, family |
+| download_cutoff | Native data provided in the sources at the cutoff date is used for the compiled database, ensures Reproducibility <br>Specified in format `YYYY-MM-DDThh:mm:ss±hh:mm`|
 
 <sup>1</sup>For downloading the native data from Github, a Github Token is required. The repo correspondence-pattern-data is private, so this source can only be used if the Github user has access to it.
 

@@ -14,4 +14,5 @@
   ["ambig", "MK", 0, "2"]
 ],
 "glottolog_tree_required" : 1,
-"flat_paths" : 1}
+"flat_paths" : 1,
+"download_cutoff": "2024-01-16T07:59:48+00:00"}

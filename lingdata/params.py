@@ -14,9 +14,9 @@ partition_types = []
 
 
 glottolog_tree_required = False
-
 flat_paths = False
 
+download_cutoff = None
 
 github_token = ""
 

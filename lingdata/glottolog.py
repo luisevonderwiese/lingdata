@@ -7,6 +7,8 @@ import pandas as pd
 from ete3 import Tree
 import numpy as np
 from github import Github, UnknownObjectException
+from termcolor import colored
+import json
 
 import lingdata.params as params
 import lingdata.pathbuilder as pb
@@ -44,22 +46,43 @@ def crawl():
     github = Github(params.github_token)
     cldf_repo = github.get_repo(cldf_repo_name)
     tag = next((x for x in cldf_repo.get_tags() if x.name == params.glottolog_version))
-    cldf_sha = tag.commit.sha
-    if not os.path.exists(glottolog_path):
-        os.makedirs(glottolog_path)
+    sha = tag.commit.sha
+    if os.path.exists(glottolog_path):
+        meta_path = os.path.join(glottolog_path, "meta.json")
+        if os.path.isfile(meta_path):
+            with open(meta_path, 'r') as openfile:
+                json_data = json.load(openfile)
+            if json_data["sha"] == sha:
+                print(colored("Glottolog files up to date", "yellow"))
+            return
+    pb.mk_this_dir(glottolog_path)
+    meta_dict = {"sha" : sha}
+    with open(os.path.join(glottolog_path, "meta.json"), 'w+') as outfile:
+        json.dump(meta_dict, outfile)
+
     for file_name in required_files:
-        download_file(cldf_repo, file_name, cldf_sha)
-    if os.path.isfile(raw_tree_path()):
-        print("Raw tree exists")
-    else:
+        try:
+            download_file(cldf_repo, file_name, sha)
+            print(colored("Glottolog " + file_name + " downloaded", "green"))
+        except:
+            print(colored("Glottolog " + file_name + ": error occured", "red"))
+            pb.rm_this_dir(glottolog_path)
+            return
+    try:
         r = requests.get(params.glottolog_tree_url, allow_redirects=True)
         open(raw_tree_path(), 'wb').write(r.content)
-    if os.path.isfile(full_tree_path()):
-        print("Extracted tree exists")
-    else:
+        print(colored("Glottolog tree downloaded", "green"))
+    except:
+        print(colored("Glottolog tree: error occured", "red"))
+        pb.rm_this_dir(glottolog_path)
+        return
+    try:
         extract_full_glottolog_tree()
-
-
+        print(colored("Glottolog tree extracted", "green"))
+    except:
+        print(colored("Glottolog tree extraction: error occured", "red"))
+        pb.rm_this_dir(glottolog_path)
+        return
 
 def extract_full_glottolog_tree():
     #code adapted from gerhard jaeger
