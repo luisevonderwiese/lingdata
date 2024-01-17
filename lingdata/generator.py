@@ -1,10 +1,8 @@
 import sys
 from termcolor import colored
 
-import lingdata.native_data as native_data
 import lingdata.params as params
 from lingdata.native_data import CLDFHandler
-from lingdata.categorical import CategoricalData
 
 
 def set_unlimited_params():

@@ -1,8 +1,6 @@
 
 from github import Github, UnknownObjectException
 import requests
-import datetime
-from datetime import datetime
 import os
 import json
 from termcolor import colored
@@ -74,7 +72,7 @@ def crawl_cldf():
             for (i, src_file_name) in enumerate(cldf_src_file_names):
                 download_file(repo, src_file_name, dest_file_names[i], sha)
             print(colored(ds_id + " from " + source +  " downloaded", "green"))
-        except Exception as e:
+        except:
             print(colored(ds_id + " from " + source +  ": error occured", "red"))
             pb.rm_this_dir(download_dir)
 

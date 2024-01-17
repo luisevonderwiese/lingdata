@@ -2,7 +2,6 @@ import os
 import requests
 import copy
 import re
-import math
 import pandas as pd
 from ete3 import Tree
 import numpy as np
@@ -124,6 +123,7 @@ def extract_full_glottolog_tree():
     glot.prune([glot&x for x in gTaxa])
 
     glot.write(outfile = full_tree_path(), format=9)
+    global full_tree
     full_tree = glot
 
 
@@ -193,7 +193,7 @@ def get_tree(glottocodes):
     tree = copy.deepcopy(full_tree)
     try:
         tree.prune([tree&glottocode for glottocode in glottocodes])
-    except Exception as e: #node not found due to wrong / deprecated glottocodes
+    except: #node not found due to wrong / deprecated glottocodes
         return None
     for leaf in tree.iter_leaves():
         leaf.add_features(new = False)

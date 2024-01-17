@@ -1,6 +1,5 @@
 import random
 import pandas as pd
-from Bio import AlignIO
 from Bio.AlignIO.PhylipIO import RelaxedPhylipWriter
 from Bio.SeqRecord import SeqRecord
 from Bio.Align import MultipleSeqAlignment

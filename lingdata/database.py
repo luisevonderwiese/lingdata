@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-from ete3 import Tree
 import json
 from ast import literal_eval
 from getpass4 import getpass
