@@ -216,10 +216,10 @@ class Handler:
             return []
         return native_data.get_data(glottolog.split_families(self.get_glottocodes()[0]))
 
-    def get_date(self):
+    def get_sha(self):
         with open(os.path.join(self.source_path, "meta.json"), 'r') as openfile:
             json_data = json.load(openfile)
-        return json_data["updated_at"]
+        return json_data["sha"]
 
 
 

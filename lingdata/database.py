@@ -36,8 +36,9 @@ columns = [
             "glottolog_tree_path",
             "msa_paths",
             "primary_source",
-            "modification_date",
-            "glottolog_version"
+            "native_data_source_sha",
+            "glottolog_version",
+            "download_cutoff"
             ]
 
 converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").split(", ")],
@@ -183,8 +184,9 @@ def write_csv(data_units):
 
         #source information
         db_df.at[i, "primary_source"] = data_unit.primary_source
-        db_df.at[i, "modification_date"] = data_unit.date
+        db_df.at[i, "native_data_source_sha"] = data_unit.sha
         db_df.at[i, "glottolog_version"] = params.glottolog_version
+        db_df.at[i, "download_cutoff"] = params.download_cutoff
 
     db_df.to_csv(pb.metadata_path(), sep = ";")
 
@@ -222,7 +224,7 @@ def compile_data_units(ds_id, source, ling_type):
         return data_units
 
     #general
-    date = handler.get_date()
+    sha = handler.get_sha()
     primary_source = handler.get_source()
 
     for data, family in data_list:
@@ -233,7 +235,7 @@ def compile_data_units(ds_id, source, ling_type):
         data_unit.source = source
         data_unit.ling_type = ling_type
         data_unit.family = family
-        data_unit.date = date
+        data_unit.sha = sha
         data_unit.primary_source = primary_source
 
 
@@ -307,7 +309,7 @@ class DataUnit:
     family = ""
 
     primary_source = ""
-    date = None
+    sha = ""
     sub_families = []
 
 
