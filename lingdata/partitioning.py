@@ -12,7 +12,7 @@ class Partitioning:
             x  = max(2, num)
             while(len(self.char_idx_partitions_x) < x + 1):
                 self.char_idx_partitions_x.append([])
-            self.char_idx_partitions_x[x].append(char_idx) #+1 because raxml-ng partitions index from 1
+            self.char_idx_partitions_x[x].append(char_idx)
 
         #all sites with x <= self.bi_split are assigned to model with x=bi_split, all others to model with x=max_x
         assert(self.char_idx_partitions_x[0] == [])
@@ -103,14 +103,14 @@ class Partitioning:
             partitions_to_consider = self.char_to_site_indices(self.char_idx_partitions_2, msa_type)
         else:
             raise Exception ("Illegal partition mode", mode)
-        partition_strings = {}
+        partition_strings = []
         for (x, partition) in enumerate(partitions_to_consider):
             interval_string = self.get_interval_string(partition, ",")
             if interval_string != "":
                 part_model = self.get_part_model(msa_type, model, gamma, x)
-                partition_strings[part_model] = interval_string
+                partition_strings.append((part_model, interval_string))
         with open(path, "w+") as part_file:
             i = 1
-            for (part_model, intervals) in partition_strings.items():
+            for (part_model, intervals) in partition_strings:
                 part_file.write(part_model + ",  p" + str(i) + "=" + intervals + "\n")
                 i += 1
