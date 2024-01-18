@@ -96,7 +96,7 @@ def read_config(config_path):
     if not type(params.partition_types) is list:
         raise Exception("Malformed config: partition_types must be a list")
     for partition_type in params.partition_types:
-        if partition_type[0] not in all_msa_types or partition_type[1] not in ["MK", "GTR"] or partition_type[2] not in [0, 1] or partition_type[3] not in ["2", "x"]:
+        if partition_type[0] not in ["bin", "multi", "ambig"] or partition_type[1] not in ["MK", "GTR", "BIN"] or partition_type[2] not in [0, 1] or partition_type[3] not in ["2", "x"]:
             raise Exception("Malformed config: invalid partition_type " + partition_type)
 
     params.glottolog_tree_required = json_object["glottolog_tree_required"]
@@ -174,10 +174,10 @@ def write_csv(data_units):
         db_df.at[i, "sampled_msa_paths"] = sampled_msa_paths
 
         partition_paths = {}
-        for [msa_type, multi_model, gamma, mode] in params.partition_types:
-            partition_path = data_unit.partition_path(msa_type, multi_model, gamma, mode)
+        for [msa_type, model, gamma, mode] in params.partition_types:
+            partition_path = data_unit.partition_path(msa_type, model, gamma, mode)
             if os.path.isfile(partition_path):
-                partition_paths[pb.partition_name(msa_type, multi_model, gamma, mode)] = partition_path
+                partition_paths[pb.partition_name(msa_type, model, gamma, mode)] = partition_path
         db_df.at[i, "partition_paths"] = ""
         db_df.at[i, "partition_paths"] = partition_paths
 
@@ -285,10 +285,10 @@ def compile_samples(data, data_unit):
 
 
 def compile_paritions(data, data_unit):
-    for [msa_type, multi_model, gamma, mode] in params.partition_types:
-        partition_path = data_unit.partition_path(msa_type, multi_model, gamma, mode)
+    for [msa_type, model, gamma, mode] in params.partition_types:
+        partition_path = data_unit.partition_path(msa_type, model, gamma, mode)
         pb.mk_file_dir(partition_path)
-        data.write_partitioning(partition_path, msa_type, multi_model, gamma, mode)
+        data.write_partitioning(partition_path, msa_type, model, gamma, mode)
 
 def download():
     params.github_token = getpass("Please enter github token: ")
@@ -327,5 +327,5 @@ class DataUnit:
     def sample_path(self, i):
         return pb.sample_path(self.ds_id, self.source, self.ling_type, self.family, i)
 
-    def partition_path(self, msa_type, multi_model, gamma, mode):
-        return pb.partition_path(self.ds_id, self.source, self.ling_type, self.family, msa_type, multi_model, gamma, mode)
+    def partition_path(self, msa_type, model, gamma, mode):
+        return pb.partition_path(self.ds_id, self.source, self.ling_type, self.family, msa_type, model, gamma, mode)

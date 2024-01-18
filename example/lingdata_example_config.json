@@ -10,8 +10,8 @@
 "partition_types" : [
   ["multi", "MK", 0, "x"],
   ["multi", "MK", 0, "2"],
-  ["ambig", "MK", 0, "x"],
-  ["ambig", "MK", 0, "2"]
+  ["bin", "BIN", 1, "x"],
+  ["bin", "BIN", 1, "2"]
 ],
 "glottolog_tree_required" : 1,
 "flat_paths" : 1,

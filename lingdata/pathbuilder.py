@@ -65,11 +65,11 @@ def msa_path(ds_id, source, ling_type, family, msa_type):
         name = msa_type + ".phy"
     return os.path.join(family_path("msa", ds_id, source, ling_type, family), name)
 
-def partition_path(ds_id, source, ling_type, family, msa_type, multi_model, gamma, mode):
-    return os.path.join(family_path("partitioning", ds_id, source, ling_type, family), partition_name(msa_type, multi_model, gamma, mode) + ".part")
+def partition_path(ds_id, source, ling_type, family, msa_type, model, gamma, mode):
+    return os.path.join(family_path("partitioning", ds_id, source, ling_type, family), partition_name(msa_type, model, gamma, mode) + ".part")
 
-def partition_name(msa_type, multi_model, gamma, mode):
-    name = msa_type + "_" + multi_model
+def partition_name(msa_type, model, gamma, mode):
+    name = msa_type + "_" + model
     if gamma:
         name += "+G"
     name += "_" + mode

@@ -400,7 +400,7 @@ class CategoricalData:
         return len(self.get_value_number_counts()) > 2
 
 
-    def write_partitioning(self, path, msa_type, multi_model, gamma, mode):
+    def write_partitioning(self, path, msa_type, model, gamma, mode):
         if self.partitioning is None:
             self.partitioning = Partitioning([len(self.get_possible_values(char_idx)) for char_idx in range(self.num_chars())])
-        self.partitioning.write(path, msa_type, multi_model, gamma, mode)
+        self.partitioning.write(path, msa_type, model, gamma, mode)

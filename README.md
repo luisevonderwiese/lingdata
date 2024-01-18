@@ -48,16 +48,18 @@ For an example see `example/lingdata_example_config.json`
 | `sources` | sources from which data is added to the compiled database <br>Supported sources: `"lexibank"` (<https://github.com/lexibank>), `"SequenceComparison"` (<https://github.com/SequenceComparison>), `"correspondence-pattern-data"` (<https://github.com/lingpy/correspondence-pattern-data>)<sup>1</sup> |
 | `ling_types` | Datasets of the provided linguistic data type are added to the compiled database <br>Supported types: `"cognate"`, `"structural"` (morpho-syntactic or morpho-phonological data), `"correspondence"` (sound correspondence patterns) |
 | `msa_types` | MSA (character matrix) types contained in the compiled database <br>Supported types: `"bin"` (binary), `"multi"` (multi-valued), `"catg_bin"` (probabilistic binary), `"catg_multi"` (probabilistic multi-valued), `"ambig"` (with user defined state encoding)<sup>2</sup> |
-| `partition_types` | [Partitionings]() contained in the compiled database <br>Partition type specified as [msa_type, multi_model, gamma, mode] where <br>msa_type: valid msa_type (see above) <br>multi_model: `"MK"`, `"GTR"` ([details](https://github.com/amkozlov/raxml-ng/wiki/Input-data#evolutionary-model)) <br>gamma: `0`, `1` ([details](https://github.com/amkozlov/raxml-ng/wiki/Input-data#evolutionary-model)) <br>mode: `"2"`, `"x"` (`"2"`: two partitions only (characteristics with <= 2 / > 2 values), "x"`: One partition for each number of values per characteristic)|
+| `partition_types` | [Partitionings]() contained in the compiled database <br>Partition type specified as [msa_type, model, gamma, mode] where <br>msa_type: in `"bin"`, `"multi"`, `"ambig"`<sup>3</sup> <br>model: `"BIN"`, `"MK"`, `"GTR"` ([details](https://github.com/amkozlov/raxml-ng/wiki/Input-data#evolutionary-model)) <br>gamma: `0`, `1` ([details](https://github.com/amkozlov/raxml-ng/wiki/Input-data#evolutionary-model)) <br>mode: `"2"`, `"x"` (`"2"`: two partitions only (characteristics with <= 2 / > 2 values), "x"`: One partition for each number of values per characteristic)|
 | `glottolog_tree_required` | `1`: only datasets with existing glottolog tree must be added to the compiled database <br>`0`: datasets are added to the compiled database no matter whether a glottolog tree exists or not |
 | flat_paths | `1`: data is stored in a directory structure with one level only <br>`0`: data is stored in hierarchical structure with one level for each ds_id, source, ling_type, family |
-| download_cutoff | Native data provided in the sources<sup>3</sup> at the cutoff date is used for the compiled database, ensures reproducibility <br>Specified in format `YYYY-MM-DDThh:mm:ss±hh:mm`|
+| download_cutoff | Native data provided in the sources<sup>4</sup> at the cutoff date is used for the compiled database, ensures reproducibility <br>Specified in format `YYYY-MM-DDThh:mm:ss±hh:mm`|
 
 <sup>1</sup>For downloading the native data from Github, a Github Token is required. The repo correspondence-pattern-data is private, so this source can only be used if the Github user has access to it.
 
 <sup>2</sup>Not every type can be created for every data set. Details [here](https://github.com/amkozlov/raxml-ng/wiki/Input-data#multiple-sequence-alignment)
 
-<sup>3</sup>Does not affect Glottolog. For Glottolog we use version 4.8. Glottolog version cannot be changed by the user because this involves updating the download link for the corresponding tree.
+<sup>3</sup>Partition is only created if the corresponding MSA could be created as well. Partitioning is no supported for probabilistic MSAs at the moment.
+
+<sup>4</sup>Does not affect Glottolog. For Glottolog we use version 4.8. Glottolog version cannot be changed by the user because this involves updating the download link for the corresponding tree.
 
 ## File Structure of the Compiled Database
 Each of the listed directories (except from `native_dir/glottolog/` and `data_dir/charmaps/`) contains a subdirectory with the respective files for each dataset. All paths are provided in the respective columns of `data_dir/lingdata.csv`.
