@@ -1,8 +1,15 @@
 import os
 import pandas as pd
 from Levenshtein import distance
-import paramsimport lingdata.pathbuilder as pb
+import lingdata.pathbuilder as pb
 import lingdata.params as params
+
+def drop_columns_except(df, relevant_columns):
+    new_df = df
+    for column in df.columns:
+        if not column in relevant_columns:
+            new_df = new_df.drop(column, axis=1)
+    return new_df
 
 
 
@@ -13,7 +20,7 @@ def generate_membership_msa(ds_id, source, ling_type, family):
         return #family splitting not supported
     if source not in params.source_types["cldf"]:
         return #only supported fopr cldf
-    source_path = pb.source_path("native", ds_id, source
+    source_path = pb.source_path("native", ds_id, source)
     forms_path = os.path.join(source_path, "forms.csv")
     if not os.path.isfile(forms_path):
         return
@@ -27,7 +34,7 @@ def generate_membership_msa(ds_id, source, ling_type, family):
     if len(cognates_df.index) == 0:
         return
 
-    forms_df = drop_columns_except(forms_df, ["ID", "Language_ID", "Parameter_ID", "Segemnts"])
+    forms_df = drop_columns_except(forms_df, ["ID", "Language_ID", "Parameter_ID", "Segments"])
     forms_df = forms_df.rename(columns={'Parameter_ID': 'Char_ID'})
     forms_df = forms_df.astype({'Language_ID':'string'})
 
@@ -43,7 +50,7 @@ def generate_membership_msa(ds_id, source, ling_type, family):
     forms_df = forms_df.drop("ID", axis=1)
     forms_df = forms_df.astype(str)
     forms_df.drop_duplicates(keep=False, inplace=True)
-    concepts = list(forms_df['Parameter_ID'].unique())
+    concepts = list(forms_df['Char_ID'].unique())
     all_languages = list(forms_df['Language_ID'].unique())
     all_languages.sort()
     num_sites = 0
@@ -51,7 +58,7 @@ def generate_membership_msa(ds_id, source, ling_type, family):
     probs = []
     for concept in concepts:
         print(concept)
-        concept_df = forms_df[forms_df["Parameter_ID"] == concept]
+        concept_df = forms_df[forms_df["Char_ID"] == concept]
         cognate_classes = list(concept_df['Value'].unique())
         num_sites += len(cognate_classes)
         for cognate_class in cognate_classes:
@@ -61,15 +68,18 @@ def generate_membership_msa(ds_id, source, ling_type, family):
             languages.sort()
             for language in languages:
                 language_df = class_df[class_df["Language_ID"] == language]
-                if not (len(language_df) == 1):
-                    print(language_df)
-                forms.append(language_df.iloc[0]["Segments"].replace(" ", ""))
+                language_forms = [segments.replace(" ", "") for segments in list(language_df['Segments'].unique())]
+                forms.append(language_forms)
             dm = [[0 for i in range(len(languages))] for j in range(len(languages))]
-            for i, form1 in enumerate(forms):
+            for i, forms_lang1 in enumerate(forms):
                 for j in range(i):
-                    form2 = forms[j]
-                    l = max(len(form1), len(form2))
-                    d =  distance(form1, form2) / l
+                    forms_language2 = forms[j]
+                    distances = []
+                    for form1 in forms_lang1:
+                        for form2 in forms_language2:
+                            l = max(len(form1), len(form2))
+                            distances.append(distance(form1, form2) / l)
+                    d = sum(distances) / len(distances) #maybe also min or max?
                     dm[i][j] = d
                     dm[j][i] = d
             i = 0

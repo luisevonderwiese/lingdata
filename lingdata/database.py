@@ -269,7 +269,8 @@ def compile_data_units(ds_id, source, ling_type):
 
         compile_samples(data, data_unit)
         compile_paritions(data, data_unit)
-        membership.generate_membership_msa(ds_id, source)
+        if "membership" in params.msa_types:
+            membership.generate_membership_msa(ds_id, source, ling_type, family)
 
         data_units.append(data_unit)
         print(colored("Data created for [ " + ds_id + " " + source + " " + ling_type + " " + family + " ]", "green"))
