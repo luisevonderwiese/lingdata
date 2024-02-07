@@ -12,6 +12,7 @@ import lingdata.pathbuilder as pb
 import lingdata.params as params
 import lingdata.native_data as native_data
 import lingdata.state_encoding as state_encoding
+import lingdata.membership as membership
 
 
 columns = [
@@ -48,7 +49,7 @@ converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").sp
 
 all_sources = ["lexibank", "SequenceComparison", "correspondence-pattern-data"]
 all_ling_types = ["cognate", "structural", "correspondence"]
-all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig"]
+all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership"]
 
 def read_config(config_path):
     with open(config_path, 'r') as openfile:
@@ -268,6 +269,7 @@ def compile_data_units(ds_id, source, ling_type):
 
         compile_samples(data, data_unit)
         compile_paritions(data, data_unit)
+        membership.generate_membership_msa(ds_id, source)
 
         data_units.append(data_unit)
         print(colored("Data created for [ " + ds_id + " " + source + " " + ling_type + " " + family + " ]", "green"))
