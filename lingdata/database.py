@@ -43,7 +43,7 @@ columns = [
             ]
 
 converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").split(", ")],
-            "value_number_matrix": lambda x: [[int(inner_el) for inner_el in el.strip("[]").split(", ")] for el in x.strip("[]").split(", ")],
+           # "value_number_matrix": lambda x: [] if x == "[]" else [[] if el == "[]" else [int(inner_el) for inner_el in el.strip("[]").split(", ")] for el in x.strip("[]").split(", ")],
                 "sub_families": lambda x: [] if x == "set()" else [el.strip("'")  for el in x.strip("{}").split(", ")],
                 "sampled_msa_paths": lambda x: [] if x == "[]" else [el.strip("'") for el in x.strip("[]").split(", ")],
                 "msa_paths" : literal_eval,

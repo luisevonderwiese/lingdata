@@ -392,8 +392,8 @@ class CategoricalData:
                 counts[num] += 1
         return counts
 
-    def get_value_count_matrix(self):
-        counts = [[] for i in range(self.max_values + 1)]
+    def get_value_number_matrix(self):
+        counts = [[] for i in range(self.max_values() + 1)]
         for char_idx in range(self.num_chars()):
             num_possible_values = len(self.get_possible_values(char_idx))
             for taxon_idx in range(self.num_taxa()):
