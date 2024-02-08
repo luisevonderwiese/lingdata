@@ -157,6 +157,7 @@ class CategoricalData:
     def size(self):
         return self.num_taxa() * self.num_chars()
 
+
     def get_possible_values(self, char_idx):
         value_set = set()
         entries = self.matrix[char_idx]
@@ -391,6 +392,16 @@ class CategoricalData:
                 counts[num] += 1
         return counts
 
+    def get_value_count_matrix(self):
+        counts = [[] for i in range(self.max_values + 1)]
+        for char_idx in range(self.num_chars()):
+            num_possible_values = len(self.get_possible_values(char_idx))
+            for taxon_idx in range(self.num_taxa()):
+                num = len(self.matrix[char_idx][taxon_idx])
+                while(len(counts[num_possible_values]) < num + 1):
+                    counts[num_possible_values].append(0)
+                counts[num_possible_values][num] += 1
+        return counts
 
 
     def get_multistate_ratio(self):

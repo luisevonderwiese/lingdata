@@ -27,6 +27,7 @@ columns = [
             "sites_per_char",
             "multistate_ratio",
             "value_number_counts",
+            "value_number_matrix",
             "max_values",
             "MULTIx_MK",
             "MULTIx_GTR",
@@ -42,6 +43,7 @@ columns = [
             ]
 
 converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").split(", ")],
+            "value_number_matrix": lambda x: [[int(inner_el) for inner_el in el.strip("[]").split(", ")] for el in x.strip("[]").split(", ")],
                 "sub_families": lambda x: [] if x == "set()" else [el.strip("'")  for el in x.strip("{}").split(", ")],
                 "sampled_msa_paths": lambda x: [] if x == "[]" else [el.strip("'") for el in x.strip("[]").split(", ")],
                 "msa_paths" : literal_eval,
@@ -139,6 +141,7 @@ def write_csv(data_units):
         db_df.at[i, "sites_per_char"] = data.sites_per_char()
         db_df.at[i, "multistate_ratio"] = data.get_multistate_ratio()
         db_df.at[i, "value_number_counts"] = data.get_value_number_counts()
+        db_df.at[i, "value_number_matrix"] = data.get_value_number_matrix()
         x = data.max_values()
         db_df.at[i, "max_values"] = x
         #multi models
