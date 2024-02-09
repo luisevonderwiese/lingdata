@@ -285,6 +285,8 @@ class CategoricalData:
                 continue
             for (taxon_idx, code) in enumerate(codes):
                 sequences[taxon_idx] += code
+        if sequences[0] == "":
+            return None
         records = [SeqRecord(sequences[taxon_idx],
                              id=str(self.taxon_ids[taxon_idx])) for taxon_idx in range(self.num_taxa())]
         msa = MultipleSeqAlignment(records, annotations={}, column_annotations={})
