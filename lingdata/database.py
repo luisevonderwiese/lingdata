@@ -29,10 +29,14 @@ columns = [
             "value_number_counts",
             "value_number_matrix",
             "max_values",
+            "max_values_prototype",
+            "num_discarded_prototype",
             "MULTIx_MK",
             "MULTIx_GTR",
             "MULTIx_MK+M",
             "MULTIx_GTR+M",
+            "MULTIx_MK_prototype",
+            "MULTIx_GTR_prototype",
             "categorical_path",
             "glottolog_tree_path",
             "msa_paths",
@@ -51,7 +55,7 @@ converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").sp
 
 all_sources = ["lexibank", "SequenceComparison", "correspondence-pattern-data"]
 all_ling_types = ["cognate", "structural", "correspondence"]
-all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership"]
+all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership", "prototype"]
 
 def read_config(config_path):
     with open(config_path, 'r') as openfile:
@@ -154,6 +158,11 @@ def write_csv(data_units):
         else:
             db_df.at[i, "MULTIx_MK+M"] = ""
             db_df.at[i, "MULTIx_GTR+M"] = ""
+        x = data.max_values_prototype()
+        db_df.at[i, "max_values_prototype"] = x
+        db_df.at[i, "MULTIx_MK_prototype"] = "MULTI" + str(x) + "_MK"
+        db_df.at[i, "MULTIx_GTR_prototype"] = "MULTI" + str(x) + "_GTR"
+        db_df.at[i, "num_discarded_prototype"] = data.num_discarded_prototype()
         #paths
         db_df.at[i, "categorical_path"] = data_unit.categorical_path()
         tree_path = data_unit.glottolog_tree_path()

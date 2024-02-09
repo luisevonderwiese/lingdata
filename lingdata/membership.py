@@ -57,7 +57,6 @@ def generate_membership_msa(ds_id, source, ling_type, family):
     cols = []
     probs = []
     for concept in concepts:
-        print(concept)
         concept_df = forms_df[forms_df["Char_ID"] == concept]
         cognate_classes = list(concept_df['Value'].unique())
         num_sites += len(cognate_classes)

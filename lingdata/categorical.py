@@ -4,6 +4,7 @@ from Bio.AlignIO.PhylipIO import RelaxedPhylipWriter
 from Bio.SeqRecord import SeqRecord
 from Bio.Align import MultipleSeqAlignment
 from termcolor import colored
+import math
 
 from lingdata.partitioning import Partitioning
 
@@ -137,6 +138,18 @@ class CategoricalData:
     def max_values(self):
         return len(self.max_values_counts()) - 1
 
+    def max_values_prototype(self):
+        x = min(int(math.floor(math.log(len(symbols), 2))), self.max_values())
+        return pow(2, x)
+
+    def num_discarded_prototype(self):
+        cnt = 0
+        for char_idx in range(self.num_chars()):
+            if pow(2, len(self.get_possible_values(char_idx))) > len(symbols):
+                cnt += 1
+        return cnt
+
+
     def max_values_counts(self):
         counts = []
         for char_idx in range(self.num_chars()):
@@ -215,9 +228,26 @@ class CategoricalData:
             ambig_codes.append(symbols[idx])
         return ambig_codes
 
+    def encode_prototype(self, char_idx, max_values):
+        if len(self.get_possible_values(char_idx)) > max_values:
+            return []
+        binary_codes = self.encode_bin(char_idx)
+        ambig_codes = []
+        for binary_code in binary_codes:
+            if binary_code.startswith("-"):
+                ambig_codes.append("-")
+                continue
+            diff = max_values - len(binary_code)
+            assert(diff >= 0)
+            padd = "0" * diff
+            binary_code = padd + binary_code
+            idx = int(binary_code, 2)
+            assert(idx < pow(2, max_values))
+            ambig_codes.append(symbols[idx])
+        return ambig_codes
+
     def get_msa(self, msa_type): #O(num_chars * num_taxa * max(possible_values))
-        if msa_type not in ["bin", "multi", "ambig"]:
-            print("Faulty msa type: " + msa_type)
+        if msa_type == "membership":
             return None
         if msa_type == "ambig":
             max_values = self.max_values()
@@ -227,6 +257,8 @@ class CategoricalData:
             if max_values < 2:
                 print(colored("ambig MSA cannot be created for dataset with " +  str(max_values) +  " < 2 max_values", "yellow"))
                 return None
+        if msa_type == "prototype":
+            max_values = min(int(math.floor(math.log(len(symbols), 2))), self.max_values())
         if msa_type == "multi":
             max_values = self.max_values()
             if max_values > len(symbols):
@@ -247,6 +279,8 @@ class CategoricalData:
                 codes = self.encode_multi(char_idx)
             elif msa_type == "ambig":
                 codes = self.encode_ambig(char_idx, max_values)
+            elif msa_type == "prototype":
+                codes = self.encode_prototype(char_idx, max_values)
             if codes == []:
                 continue
             for (taxon_idx, code) in enumerate(codes):
