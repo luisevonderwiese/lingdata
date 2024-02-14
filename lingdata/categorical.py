@@ -149,6 +149,14 @@ class CategoricalData:
                 cnt += 1
         return cnt
 
+    def site_group_sizes(self):
+        site_group_sizes = []
+        for char_idx in range(self.num_chars()):
+            num = len(self.get_possible_values(char_idx))
+            for i in range(num):
+                site_group_sizes.append(num)
+        return site_group_sizes
+
 
     def max_values_counts(self):
         counts = []
