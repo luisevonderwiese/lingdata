@@ -166,7 +166,7 @@ def write_csv(data_units):
         db_df.at[i, "max_values_prototype"] = x
         db_df.at[i, "MULTIx_MK_prototype"] = "MULTI" + str(x) + "_MK"
         db_df.at[i, "MULTIx_GTR_prototype"] = "MULTI" + str(x) + "_GTR"
-        db_df.at[i, "COGx"] = "COG" + str(pow(2, x))
+        db_df.at[i, "COGx"] = "COG" + str(x)
         db_df.at[i, "num_discarded_prototype"] = data.num_discarded_prototype()
         #paths
         db_df.at[i, "categorical_path"] = data_unit.categorical_path()
