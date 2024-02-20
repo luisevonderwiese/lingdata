@@ -57,8 +57,10 @@ def categorical_path(ds_id, source, ling_type, family):
     return os.path.join(family_path("categorical", ds_id, source, ling_type, family), "categorical.csv")
 
 def msa_path(ds_id, source, ling_type, family, msa_type):
-    if msa_type == "membership":
-        name = "membership.catg"
+    if msa_type == "membership_lev":
+        name = "membership_lev.catg"
+    if msa_type == "membership_jaro":
+        name = "membership_jaro.catg"
     if msa_type == "catg_bin":
         name = "bin.catg"
     elif msa_type == "catg_multi":

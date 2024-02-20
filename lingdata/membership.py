@@ -1,8 +1,8 @@
 import os
 import pandas as pd
-from Levenshtein import distance
 import lingdata.pathbuilder as pb
 import lingdata.params as params
+import lingdata.segmetrics as segmetrics
 
 def drop_columns_except(df, relevant_columns):
     new_df = df
@@ -13,7 +13,7 @@ def drop_columns_except(df, relevant_columns):
 
 
 
-def generate_membership_msa(ds_id, source, ling_type, family):
+def generate_membership_msa(ds_id, source, ling_type, family, dist_metric):
     if ling_type != "cognate":
         return  #makes only sence for cognate data
     if family != "full":
@@ -62,40 +62,48 @@ def generate_membership_msa(ds_id, source, ling_type, family):
         num_sites += len(cognate_classes)
         for cognate_class in cognate_classes:
             class_df = concept_df[concept_df['Value'] == cognate_class]
-            forms = []
+            all_segemnts_lists = []
             languages = list(class_df['Language_ID'].unique())
             languages.sort()
             for language in languages:
                 language_df = class_df[class_df["Language_ID"] == language]
-                language_forms = [segments.replace(" ", "") for segments in list(language_df['Segments'].unique())]
-                forms.append(language_forms)
-            dm = [[0 for i in range(len(languages))] for j in range(len(languages))]
-            for i, forms_lang1 in enumerate(forms):
+                segments_list = list(language_df['Segments'].unique())
+                if len(segments_list) == 1 and segments_list[0] == "nan":
+                    return
+                segments_list = [segments.split(" ") for segments in segments_list]
+                segments_list = [list(filter(lambda s: s != "+", segments)) for segments in segments_list]
+                segments_list = [segmetrics.remove_slashes(segments) for segments in segments_list]
+                all_segemnts_lists.append(segments_list)
+            dm = [[0 for i in range(len(all_segemnts_lists))] for j in range(len(languages))]
+            for i, segments_list1 in enumerate(all_segemnts_lists):
                 for j in range(i):
-                    forms_language2 = forms[j]
+                    segments_list2 = all_segemnts_lists[j]
                     distances = []
-                    for form1 in forms_lang1:
-                        for form2 in forms_language2:
-                            l = max(len(form1), len(form2))
-                            distances.append(distance(form1, form2) / l)
+                    for s1 in segments_list1:
+                        for s2 in segments_list2:
+                            if dist_metric == "lev":
+                                distances.append(segmetrics.levenshtein(s1, s2))
+                            else:
+                                distances.append(segmetrics.jaro(s1, s2))
                     d = sum(distances) / len(distances) #maybe also min or max?
+                    #print(segments_list1)
+                    #print(segments_list2)
+                    #print(d)
                     dm[i][j] = d
                     dm[j][i] = d
-            i = 0
             col = ""
             prob_vec = []
             for language in all_languages:
                 if language not in languages:
                     col += "0"
-                    zero_prob = 1.0
+                    one_prob = 0.0
                 else:
-                    zero_prob = sum(dm[i]) / len(dm[i])
-                    if zero_prob > 0.5:
-                        col+= "0"
-                    else:
+                    one_prob = sum(dm[i]) / len(dm[i])
+                    if one_prob > 0.5:
                         col+= "1"
-                    i += 1
-                one_prob = 1 - zero_prob
+                    else:
+                        col+= "0"
+                zero_prob = 1 - one_prob
                 one_prob = round(one_prob, 3)
                 zero_prob = round(zero_prob, 3)
                 prob_vec.append(str(zero_prob)+","+str(one_prob))
