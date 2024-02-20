@@ -113,7 +113,7 @@ def generate_membership_msa(ds_id, source, ling_type, family, dist_metric):
 
 
 
-    with open(pb.msa_path(ds_id, source, "cognate", "full", "membership"), "w+") as outfile:
+    with open(pb.msa_path(ds_id, source, "cognate", "full", "membership_" + dist_metric), "w+") as outfile:
         outfile.write(str(len(all_languages)) + " ")
         outfile.write(str(num_sites) + "\n")
         outfile.write(" ".join(all_languages))
