@@ -255,7 +255,7 @@ class CategoricalData:
         return ambig_codes
 
     def get_msa(self, msa_type): #O(num_chars * num_taxa * max(possible_values))
-        if msa_type == "membership_lev" or "membership_jaro":
+        if msa_type == "membership_lev" or msa_type == "membership_jaro":
             return None
         if msa_type == "ambig":
             max_values = self.max_values()
