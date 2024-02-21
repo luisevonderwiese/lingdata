@@ -79,7 +79,7 @@ class Partitioning:
         if msa_type in ["bin"]:
             if model != "BIN":
                 raise Exception("Paritioning on ", msa_type, " MSA only with model BIN not with ", model)
-            part_model = "BIN"
+            part_model = "BIN+FC"
         elif msa_type in ["multi", "ambig"]:
             if model not in ["MK", "GTR"]:
                 raise Exception("Paritioning on ", msa_type, " MSA only with model MK or GTR not with ", model)
