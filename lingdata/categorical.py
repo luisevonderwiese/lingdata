@@ -254,6 +254,22 @@ class CategoricalData:
             ambig_codes.append(symbols[idx])
         return ambig_codes
 
+
+    def encode_prototype_part(self, char_idx, num_values):
+        if len(self.get_possible_values(char_idx)) != num_values:
+            return []
+        binary_codes = self.encode_bin(char_idx)
+        ambig_codes = []
+        for binary_code in binary_codes:
+            assert(len(binary_code) == num_values)
+            if binary_code.startswith("-"):
+                ambig_codes.append("-")
+                continue
+            idx = int(binary_code, 2)
+            assert(idx < pow(2, num_values))
+            ambig_codes.append(symbols[idx])
+        return ambig_codes
+
     def get_msa(self, msa_type): #O(num_chars * num_taxa * max(possible_values))
         if msa_type.startswith("membership"):
             return None
@@ -278,6 +294,8 @@ class CategoricalData:
             if self.is_mutlistate():
                 print(colored("multi MSA cannot be created for multistate dataset", "yellow"))
                 return None
+        if msa_type.startswith("prototype_part"):
+            num_values = int(msa_type.split("_")[-1])
 
         sequences = ["" for i in range(self.num_taxa())]
         for char_idx in range(self.num_chars()): #O(num_chars * loop_complexity)
@@ -289,6 +307,8 @@ class CategoricalData:
                 codes = self.encode_ambig(char_idx, max_values)
             elif msa_type == "prototype":
                 codes = self.encode_prototype(char_idx, max_values)
+            elif msa_type.startswith("prototype_part"):
+                codes = self.encode_prototype_part(char_idx, num_values)
             if codes == []:
                 continue
             for (taxon_idx, code) in enumerate(codes):

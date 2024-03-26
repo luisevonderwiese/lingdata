@@ -58,7 +58,8 @@ converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").sp
 
 all_sources = ["lexibank", "SequenceComparison", "correspondence-pattern-data"]
 all_ling_types = ["cognate", "structural", "correspondence"]
-all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership_lev", "membership_jaro", "membership_mattis", "prototype"]
+all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership_lev", "membership_jaro", "membership_mattis", "prototype",
+                "prototype_part_2", "prototype_part_3", "prototype_part_4", "prototype_part_5", "prototype_part_6"]
 
 def read_config(config_path):
     with open(config_path, 'r') as openfile:
