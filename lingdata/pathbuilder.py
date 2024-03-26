@@ -61,6 +61,8 @@ def msa_path(ds_id, source, ling_type, family, msa_type):
         name = "membership_lev.catg"
     if msa_type == "membership_jaro":
         name = "membership_jaro.catg"
+    if msa_type == "membership_mattis":
+        name = "membership_mattis.catg"
     if msa_type == "catg_bin":
         name = "bin.catg"
     elif msa_type == "catg_multi":

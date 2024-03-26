@@ -3,6 +3,7 @@ import pandas as pd
 import lingdata.pathbuilder as pb
 import lingdata.params as params
 import lingdata.segmetrics as segmetrics
+from lingpy.align import pairwise
 
 def drop_columns_except(df, relevant_columns):
     new_df = df
@@ -83,8 +84,12 @@ def generate_membership_msa(ds_id, source, ling_type, family, dist_metric):
                         for s2 in segments_list2:
                             if dist_metric == "lev":
                                 distances.append(segmetrics.levenshtein(s1, s2))
-                            else:
+                            elif dist_metric == "jaro":
                                 distances.append(segmetrics.jaro(s1, s2))
+                            elif dist_metric == "mattis":
+                                pair = pairwise.Pairwise(s1, s2)
+                                pair.align(method='sca', distance=True)
+                                distances.append(pair.alignments[0][-1])
                     d = sum(distances) / len(distances) #maybe also min or max?
                     #print(segments_list1)
                     #print(segments_list2)

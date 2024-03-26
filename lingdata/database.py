@@ -58,7 +58,7 @@ converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").sp
 
 all_sources = ["lexibank", "SequenceComparison", "correspondence-pattern-data"]
 all_ling_types = ["cognate", "structural", "correspondence"]
-all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership_lev", "membership_jaro", "prototype"]
+all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership_lev", "membership_jaro", "membership_mattis", "prototype"]
 
 def read_config(config_path):
     with open(config_path, 'r') as openfile:
@@ -290,6 +290,8 @@ def compile_data_units(ds_id, source, ling_type):
             membership.generate_membership_msa(ds_id, source, ling_type, family, "lev")
         if "membership_jaro" in params.msa_types:
             membership.generate_membership_msa(ds_id, source, ling_type, family, "jaro")
+        if "membership_mattis" in params.msa_types:
+            membership.generate_membership_msa(ds_id, source, ling_type, family, "mattis")
 
         data_units.append(data_unit)
         print(colored("Data created for [ " + ds_id + " " + source + " " + ling_type + " " + family + " ]", "green"))
