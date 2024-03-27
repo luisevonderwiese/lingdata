@@ -21,6 +21,7 @@ columns = [
             "ling_type",
             "family",
             "sub_families",
+            "dialect_ratio",
             "num_taxa",
             "num_chars",
             "num_sites_bin"
@@ -141,6 +142,7 @@ def write_csv(data_units):
         db_df.at[i, "family"] = data_unit.family
         #families
         db_df.at[i, "sub_families"] = data_unit.sub_families
+        db_df.at[i, "dialect_ratio"] = data_unit.dialect_ratio
         #categorical data properties
         data = data_unit.data
         db_df.at[i, "num_taxa"] = data.num_taxa()
@@ -275,6 +277,8 @@ def compile_data_units(ds_id, source, ling_type):
         else:
             data_unit.sub_families = [family]
 
+        data_unit.dialect_ratio = handler.get_dialect_ratio(ling_type)
+
         #categorical
         categorical_path = data_unit.categorical_path()
         pb.mk_file_dir(categorical_path)
@@ -335,6 +339,7 @@ class DataUnit:
     primary_source = ""
     sha = ""
     sub_families = []
+    dialect_ratio = float("nan")
 
 
     def __init__(self, data):

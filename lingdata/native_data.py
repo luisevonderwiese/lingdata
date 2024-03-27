@@ -221,6 +221,14 @@ class Handler:
             json_data = json.load(openfile)
         return json_data["sha"]
 
+    def get_dialect_ratio(self, ling_type):
+        glottocodes, missing_codes = self.get_glottocodes()
+        num_glottocodes = len(glottocodes)
+        num_languages = self.get_native_data(ling_type).num_taxa()
+        num_languages_with_glottocode = num_languages - missing_codes
+        if num_languages_with_glottocode == 0:
+            return float('nan')
+        return num_glottocodes / num_languages_with_glottocode
 
 
     def get_glottocodes(self, languages_with_data = []):
