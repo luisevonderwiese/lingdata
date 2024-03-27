@@ -260,9 +260,9 @@ def compile_data_units(ds_id, source, ling_type):
 
 
         #tree
-        (glottocodes, complete) = handler.get_glottocodes(data.taxon_ids)
+        (glottocodes, missing) = handler.get_glottocodes(data.taxon_ids)
         tree_path = data_unit.glottolog_tree_path()
-        if complete:
+        if missing == 0:
             glottolog_tree = glottolog.get_tree(glottocodes)
             if glottolog_tree is not None:
                 pb.mk_file_dir(tree_path)

@@ -53,6 +53,9 @@ class NativeData:
     def num_taxa(self):
         raise NotImplementedError("Please Implement this method")
 
+    def get_languages(self):
+        raise NotImplementedError("Please Implement this method")
+
     def num_chars(self):
         raise NotImplementedError("Please Implement this method")
 
@@ -88,6 +91,11 @@ class ListData(NativeData):
     def full_data(self):
         return [(CategoricalData.from_list_df(self.df), "full")]
 
+    def get_languages(self):
+        if self.df is None:
+            return []
+        return self.df['Language_ID'].unique()
+
 
 class MatrixData(NativeData):
 
@@ -118,6 +126,9 @@ class MatrixData(NativeData):
 
     def full_data(self):
         return [(CategoricalData.from_matrix_df(self.df), "full")]
+
+    def get_languages(self):
+        return self.df.columns[2:]
 
 class CLDFCognateData(ListData):
 
@@ -214,7 +225,7 @@ class Handler:
         native_data = self.get_native_data(ling_type)
         if native_data is None:
             return []
-        return native_data.get_data(glottolog.split_families(self.get_glottocodes()[0]))
+        return native_data.get_data(glottolog.split_families(self.get_glottocodes(native_data.get_languages())[0]))
 
     def get_sha(self):
         with open(os.path.join(self.source_path, "meta.json"), 'r') as openfile:
@@ -222,25 +233,31 @@ class Handler:
         return json_data["sha"]
 
     def get_dialect_ratio(self, ling_type):
-        glottocodes, missing_codes = self.get_glottocodes()
+        native_data = self.get_native_data(ling_type)
+        glottocodes, missing_codes = self.get_glottocodes(native_data.get_languages())
         num_glottocodes = len(glottocodes)
-        num_languages = self.get_native_data(ling_type).num_taxa()
+        num_languages = native_data.num_taxa()
         num_languages_with_glottocode = num_languages - missing_codes
         if num_languages_with_glottocode == 0:
             return float('nan')
+        assert(num_languages_with_glottocode >= num_glottocodes)
         return num_glottocodes / num_languages_with_glottocode
 
 
-    def get_glottocodes(self, languages_with_data = []):
+    def get_glottocodes(self, languages_with_data):
+        if len(languages_with_data) == 0:
+            return({}, False)
         df = self.get_languages_df()
         if df is None:
             return({}, False)
-        if languages_with_data != []:
-            df = df[df['ID'].isin(languages_with_data)]
+        #if languages_with_data != []:
+        #    df = df[df['ID'].isin(languages_with_data)]
         num_missing_codes = 0
         glottocodes = {}
         for index, row in df.iterrows():
             lang_id = row["ID"]
+            if lang_id not in languages_with_data:
+                continue
             glottocode = row["Glottocode"]
             if glottocode !=  glottocode:
                 num_missing_codes += 1
@@ -249,7 +266,7 @@ class Handler:
                 glottocodes[glottocode].append(lang_id)
             else:
                 glottocodes[glottocode] = [lang_id]
-        return (glottocodes, num_missing_codes == 0)
+        return (glottocodes, num_missing_codes)
 
 
 
