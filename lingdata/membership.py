@@ -100,7 +100,6 @@ def generate_membership_msa(ds_id, source, ling_type, family, dist_metric):
             prob_vec = []
             for language in all_languages:
                 if language not in languages:
-                    col += "0"
                     zero_prob = 1.0
                 else:
                     zero_prob = sum(dm[i]) / len(dm[i])
