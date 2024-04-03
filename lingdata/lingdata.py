@@ -62,7 +62,7 @@ def main():
         "--ling_type",
         required=('--generate' in sys.argv),
         help="Linguistic datatype of input data",
-        choices=["cognate", "structural", "correspondence"]
+        choices=["cognate", "structural"]
     )
 
     parser.add_argument(

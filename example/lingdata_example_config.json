@@ -4,8 +4,8 @@
 "num_samples": 100,
 "data_dir" : "../example_data/generated",
 "native_dir" : "../example_data/native",
-"sources" : ["lexibank", "SequenceComparison", "correspondence-pattern-data"],
-"ling_types" : ["cognate", "structural", "correspondence"],
+"sources" : ["lexibank", "SequenceComparison"],
+"ling_types" : ["cognate", "structural"],
 "msa_types" : ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership_lev", "membership_jaro", "membership_mattis"],
 "partition_types" : [
   ["multi", "MK", 0, "x"],

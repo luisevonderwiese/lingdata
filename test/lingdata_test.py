@@ -14,7 +14,6 @@ import lingdata.native_data as native_data
 
 
 from oldcldf import OldCLDFHandler
-import correspondences_jaeger
 import partitioning_reference
 
 
@@ -151,7 +150,7 @@ def test_categorical_read_write():
     for ds_id in os.listdir(pb.domain_path("native")):
         for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -166,9 +165,9 @@ def test_categorical_read_write():
 
 def test_df_creation():
     for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.source_types["cldf"]:
+        for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -182,32 +181,11 @@ def test_df_creation():
     print("========== CLDF CATEGORICAL CORRECTNESS TEST PASSED")
 
 
-def test_df_creation_correspondence():
-    test_dir = "test_temp/"
-    path = os.path.join(test_dir, "test.csv")
-    if not os.path.exists(test_dir):
-        os.makedirs(test_dir)
-    for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.source_types["correspondence"]:
-            ling_type = "correspondence"
-            handler = native_data.get_handler(ds_id, source)
-            data_list = handler.get_data(ling_type)
-            for data, family in data_list:
-                if data is None:
-                    continue
-                if family != "full":
-                    continue
-                align1 = data.get_msa("bin")
-                align2 = correspondences_jaeger.bin_align(os.path.join(pb.source_path("native", ds_id, source), "correspondence.tsv"))
-                assert(equal_aligns(align1, align2))
-    print("========== CORRESPONDENCES CATEGORICAL CORRECTNESS TEST PASSED")
-
-
 def test_bin_align():
     for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.source_types["cldf"]:
+        for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -223,9 +201,9 @@ def test_bin_align():
 
 def test_multi_align():
     for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.source_types["cldf"]:
+        for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -248,9 +226,9 @@ def test_multi_align():
 
 def test_ambig_align():
     for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.source_types["cldf"]:
+        for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -268,9 +246,9 @@ def test_catg():
     old_path = os.path.join(test_dir, "old.csv")
     new_path = os.path.join(test_dir, "new.csv")
     for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.source_types["cldf"]:
+        for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -292,9 +270,9 @@ def test_multi_catg():
     old_path = os.path.join(test_dir, "old.csv")
     new_path = os.path.join(test_dir, "new.csv")
     for ds_id in os.listdir(pb.domain_path("native")):
-        for source in params.source_types["cldf"]:
+        for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -310,7 +288,7 @@ def test_sample():
     for ds_id in os.listdir(pb.domain_path("native")):
         for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -325,7 +303,7 @@ def test_family_splitting():
         for source in params.sources:
             for ling_type in params.ling_types:
                 params.family_split_threshold = 5
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 split_data_list = handler.get_data(ling_type)
                 params.family_split_threshold = 10000000000
                 unsplit_data_list = handler.get_data(ling_type)
@@ -340,8 +318,8 @@ def test_family_splitting():
                     if data is None:
                         continue
                     assert(family in full_subfamilies)
-                    glottocodes, complete = handler.get_glottocodes(data.taxon_ids)
-                    assert(complete)
+                    glottocodes, missing = handler.get_glottocodes(data.taxon_ids)
+                    assert(missing == 0)
                     for glottocode in glottocodes.keys():
                         assert(glottolog.family_dict[glottocode] == family)
                     for (full_char_idx, char_id) in enumerate(full_data.char_ids):
@@ -366,7 +344,7 @@ def test_partitioning():
     for ds_id in os.listdir(pb.domain_path("native")):
         for source in params.sources:
             for ling_type in params.ling_types:
-                handler = native_data.get_handler(ds_id, source)
+                handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
                 data_list = handler.get_data(ling_type)
                 for data, family in data_list:
                     if data is None:
@@ -398,7 +376,6 @@ database.read_config(config_path)
 test_glottolog()
 test_categorical_read_write()
 test_df_creation()
-test_df_creation_correspondence()
 test_bin_align()
 test_multi_align()
 test_ambig_align()

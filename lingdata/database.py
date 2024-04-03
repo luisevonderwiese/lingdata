@@ -15,6 +15,7 @@ import lingdata.state_encoding as state_encoding
 import lingdata.membership as membership
 
 
+
 columns = [
             "ds_id",
             "source",
@@ -52,8 +53,8 @@ converters={"value_number_counts": lambda x: [int(el) for el in x.strip("[]").sp
                 "msa_paths" : literal_eval,
                 "partition_paths" : literal_eval}
 
-all_sources = ["lexibank", "SequenceComparison", "correspondence-pattern-data"]
-all_ling_types = ["cognate", "structural", "correspondence"]
+all_sources = ["lexibank", "SequenceComparison"]
+all_ling_types = ["cognate", "structural"]
 all_msa_types = ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership_lev", "membership_jaro", "membership_mattis"]
 
 def read_config(config_path):
@@ -215,9 +216,7 @@ def compile():
         for source in os.listdir(os.path.join(pb.domain_path("native"), ds_id)):
             if not source in params.sources:
                 continue
-            for ling_type in params.ling_types_for_source[source]:
-                if not ling_type in params.ling_types:
-                    continue
+            for ling_type in params.ling_types:
                 print(colored("\nChecking data for [ " + ds_id + " " + source + " " + ling_type + " ]", "white"))
                 data_units += compile_data_units(ds_id, source, ling_type)
     write_csv(data_units)
@@ -225,7 +224,7 @@ def compile():
 
 
 def compile_data_units(ds_id, source, ling_type):
-    handler = native_data.get_handler(ds_id, source)
+    handler = native_data.CLDFHandler(pb.source_path("native", ds_id, source))
     data_list = handler.get_data(ling_type)
     data_units = []
     if data_list == []:
@@ -308,7 +307,6 @@ def compile_paritions(data, data_unit):
         data.write_partitioning(partition_path, msa_type, model, gamma, mode)
 
 def download():
-    params.github_token = getpass("Please enter github token: ")
     glottolog.crawl()
     crawler.crawl()
     print(colored("Download finished. Data saved to " + params.native_dir, "green"))
