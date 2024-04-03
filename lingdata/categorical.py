@@ -138,17 +138,6 @@ class CategoricalData:
     def max_values(self):
         return len(self.max_values_counts()) - 1
 
-    def max_values_prototype(self):
-        x = min(int(math.floor(math.log(len(symbols), 2))), self.max_values())
-        return pow(2, x)
-
-    def num_discarded_prototype(self):
-        cnt = 0
-        for char_idx in range(self.num_chars()):
-            if pow(2, len(self.get_possible_values(char_idx))) > len(symbols):
-                cnt += 1
-        return cnt
-
     def site_group_sizes(self):
         site_group_sizes = []
         for char_idx in range(self.num_chars()):
@@ -236,39 +225,7 @@ class CategoricalData:
             ambig_codes.append(symbols[idx])
         return ambig_codes
 
-    def encode_prototype(self, char_idx, max_values):
-        if len(self.get_possible_values(char_idx)) > max_values:
-            return []
-        binary_codes = self.encode_bin(char_idx)
-        ambig_codes = []
-        for binary_code in binary_codes:
-            if binary_code.startswith("-"):
-                ambig_codes.append("-")
-                continue
-            diff = max_values - len(binary_code)
-            assert(diff >= 0)
-            padd = "0" * diff
-            binary_code = padd + binary_code
-            idx = int(binary_code, 2)
-            assert(idx < pow(2, max_values))
-            ambig_codes.append(symbols[idx])
-        return ambig_codes
 
-
-    def encode_prototype_part(self, char_idx, num_values):
-        if len(self.get_possible_values(char_idx)) != num_values:
-            return []
-        binary_codes = self.encode_bin(char_idx)
-        ambig_codes = []
-        for binary_code in binary_codes:
-            assert(len(binary_code) == num_values)
-            if binary_code.startswith("-"):
-                ambig_codes.append("-")
-                continue
-            idx = int(binary_code, 2)
-            assert(idx < pow(2, num_values))
-            ambig_codes.append(symbols[idx])
-        return ambig_codes
 
     def get_msa(self, msa_type): #O(num_chars * num_taxa * max(possible_values))
         if msa_type == "ambig":
@@ -279,8 +236,6 @@ class CategoricalData:
             if max_values < 2:
                 print(colored("ambig MSA cannot be created for dataset with " +  str(max_values) +  " < 2 max_values", "yellow"))
                 return None
-        if msa_type == "prototype":
-            max_values = min(int(math.floor(math.log(len(symbols), 2))), self.max_values())
         if msa_type == "multi":
             max_values = self.max_values()
             if max_values > len(symbols):
@@ -292,8 +247,6 @@ class CategoricalData:
             if self.is_mutlistate():
                 print(colored("multi MSA cannot be created for multistate dataset", "yellow"))
                 return None
-        if msa_type.startswith("prototype_part"):
-            num_values = int(msa_type.split("_")[-1])
 
         sequences = ["" for i in range(self.num_taxa())]
         for char_idx in range(self.num_chars()): #O(num_chars * loop_complexity)
@@ -303,19 +256,11 @@ class CategoricalData:
                 codes = self.encode_multi(char_idx)
             elif msa_type == "ambig":
                 codes = self.encode_ambig(char_idx, max_values)
-            elif msa_type == "prototype":
-                codes = self.encode_prototype(char_idx, max_values)
-            elif msa_type.startswith("prototype_part"):
-                codes = self.encode_prototype_part(char_idx, num_values)
             if codes == []:
                 continue
             for (taxon_idx, code) in enumerate(codes):
                 sequences[taxon_idx] += code
         if sequences[0] == "":
-            return None
-        if msa_type.startswith("prototype_part") and len(sequences[0]) < self.num_taxa():
-            print(len(sequences[0]))
-            print(sequences[0])
             return None
         records = [SeqRecord(sequences[taxon_idx],
                              id=str(self.taxon_ids[taxon_idx])) for taxon_idx in range(self.num_taxa())]
