@@ -6,7 +6,7 @@
 "native_dir" : "../example_data/native",
 "sources" : ["lexibank", "SequenceComparison", "correspondence-pattern-data"],
 "ling_types" : ["cognate", "structural", "correspondence"],
-"msa_types" : ["bin", "multi", "catg_bin", "catg_multi", "ambig", "prototype", "prototype_part_2", "prototype_part_3", "prototype_part_4", "prototype_part_5", "prototype_part_6"],
+"msa_types" : ["bin", "multi", "catg_bin", "catg_multi", "ambig", "membership_lev", "membership_jaro", "membership_mattis", "prototype", "prototype_part_2", "prototype_part_3", "prototype_part_4", "prototype_part_5", "prototype_part_6"],
 "partition_types" : [
   ["multi", "MK", 0, "x"],
   ["multi", "MK", 0, "2"],

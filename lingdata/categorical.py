@@ -271,6 +271,8 @@ class CategoricalData:
         return ambig_codes
 
     def get_msa(self, msa_type): #O(num_chars * num_taxa * max(possible_values))
+        if msa_type.startswith("membership"):
+            return None
         if msa_type == "ambig":
             max_values = self.max_values()
             if pow(2, max_values) > len(symbols):
@@ -314,8 +316,6 @@ class CategoricalData:
         if sequences[0] == "":
             return None
         if msa_type.startswith("prototype_part") and len(sequences[0]) < self.num_taxa():
-            print(len(sequences[0]))
-            print(sequences[0])
             return None
         records = [SeqRecord(sequences[taxon_idx],
                              id=str(self.taxon_ids[taxon_idx])) for taxon_idx in range(self.num_taxa())]
