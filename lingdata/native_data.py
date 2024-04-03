@@ -9,23 +9,12 @@ import lingdata.glottolog as glottolog
 import lingdata.pathbuilder as pb
 
 
-def get_handler(ds_id, source):
-    source_path = pb.source_path("native", ds_id, source)
-    if source in params.source_types["cldf"]:
-        return CLDFHandler(source_path)
-    if source in params.source_types["correspondence"]:
-        return CorrespondencePatternsHandler(source_path)
-
-
 def drop_columns_except(df, relevant_columns):
     new_df = df
     for column in df.columns:
         if not column in relevant_columns:
             new_df = new_df.drop(column, axis=1)
     return new_df
-
-
-
 
 class NativeData:
 
@@ -49,24 +38,6 @@ class NativeData:
                 print(colored("Too few taxa: " +  str(t), "red"))
                 return []
             return self.full_data()
-
-    def num_taxa(self):
-        raise NotImplementedError("Please Implement this method")
-
-    def get_languages(self):
-        raise NotImplementedError("Please Implement this method")
-
-    def num_chars(self):
-        raise NotImplementedError("Please Implement this method")
-
-    def split_data(self, families):
-        raise NotImplementedError("Please Implement this method")
-
-    def full_data(self):
-        raise NotImplementedError("Please Implement this method")
-
-
-class ListData(NativeData):
 
     def num_taxa(self):
         return len(self.df['Language_ID'].unique())
@@ -97,40 +68,7 @@ class ListData(NativeData):
         return self.df['Language_ID'].unique()
 
 
-class MatrixData(NativeData):
-
-    def num_taxa(self):
-        return len(self.df.columns) - 2
-
-    def num_chars(self):
-        return len(self.df['ID'].unique())
-
-
-    def split_data(self, families):
-        cds = []
-        for family_id, lang_ids in families.items():
-            sub_df = self.df
-            for column in self.df.columns:
-                if column not in ["ID", "FREQUENCY"] and column not in lang_ids:
-                    sub_df = sub_df.drop(column, axis=1)
-            sub_df = sub_df.drop_duplicates()
-            num_taxa = len(sub_df.columns) - 2
-            if num_taxa > params.max_num_taxa:
-                print(colored(family_id + " - Too many taxa: " +  str(num_taxa), "red"))
-                continue
-            if num_taxa < params.min_num_taxa:
-                print(colored(family_id + " - Too few taxa: " +  str(num_taxa), "red"))
-                continue
-            cds.append((CategoricalData.from_matrix_df(sub_df), family_id))
-        return cds
-
-    def full_data(self):
-        return [(CategoricalData.from_matrix_df(self.df), "full")]
-
-    def get_languages(self):
-        return self.df.columns[2:]
-
-class CLDFCognateData(ListData):
+class CLDFCognateData(NativeData):
 
     def __init__(self, source_path):
         self.df = None
@@ -164,7 +102,7 @@ class CLDFCognateData(ListData):
         self.df = self.df.astype(str)
 
 
-class CLDFStrcuturalData(ListData):
+class CLDFStrcuturalData(NativeData):
 
     def __init__(self, source_path):
         self.df = None
@@ -186,36 +124,8 @@ class CLDFStrcuturalData(ListData):
         self.df = self.df[self.df.Language_ID == self.df.Language_ID]
         self.df = self.df.astype(str)
 
-class CorrespondenceCognateData(ListData):
 
-    def __init__(self, source_path):
-        self.df = None
-        path = os.path.join(source_path, "trimmed.tsv")
-        if not os.path.isfile(path):
-            return
-        self.df = pd.read_table(path)
-        self.df = drop_columns_except(self.df, ['DOCULECT', 'CONCEPT', 'COGID'])
-        self.df = self.df.rename(columns={'DOCULECT': 'Language_ID'})
-        self.df = self.df.rename(columns={'CONCEPT': 'Char_ID'})
-        self.df = self.df.rename(columns={'COGID': 'Value'})
-        self.df = self.df.astype(str)
-
-class CorrespondenceCorrespondenceData(MatrixData):
-
-    def __init__(self, source_path):
-        self.df = None
-        path = os.path.join(source_path, "correspondence.tsv")
-        if not os.path.isfile(path):
-            return None
-        self.df = pd.read_table(path)
-        self.df = self.df.drop("STRUCTURE", axis=1)
-        self.df = self.df.drop("COGNATESETS", axis=1)
-        self.df = self.df.drop("CONCEPTS", axis=1)
-        self.df = self.df.replace("Ø", "")
-        self.df = self.df[self.df["FREQUENCY"] > 2]
-
-
-class Handler:
+class CLDFHandler():
 
     def __init__(self, source_path):
         self.source_path = source_path
@@ -270,24 +180,6 @@ class Handler:
 
 
 
-    def get_native_data(self, ling_type):
-        raise NotImplementedError("Please Implement this method")
-
-    def get_languages_df(self):
-        raise NotImplementedError("Please Implement this method")
-
-    def get_source(self):
-        raise NotImplementedError("Please Implement this method")
-
-
-
-
-
-class CLDFHandler(Handler):
-
-    def __init__(self, source_path):
-        super().__init__(source_path)
-
     def get_languages_df(self):
         languages_path = os.path.join(self.source_path, "languages.csv")
         if not os.path.isfile(languages_path):
@@ -306,7 +198,6 @@ class CLDFHandler(Handler):
             return CLDFCognateData(self.source_path)
         elif ling_type == "structural":
             return CLDFStrcuturalData(self.source_path)
-
 
 
 
@@ -346,35 +237,3 @@ class CLDFHandler(Handler):
         if not "dc:bibliographicCitation" in d:
             return ""
         return d["dc:bibliographicCitation"]
-
-
-
-
-
-
-class CorrespondencePatternsHandler(Handler):
-    def __init__(self, source_path):
-        super().__init__(source_path)
-
-    def get_native_data(self, ling_type):
-        if ling_type == "cognate":
-            return CorrespondenceCognateData(self.source_path)
-        if ling_type == "correspondence":
-            return CorrespondenceCorrespondenceData(self.source_path)
-
-
-    def get_languages_df(self):
-        path = os.path.join(self.source_path, "trimmed.tsv")
-        if not os.path.isfile(path):
-            return None
-        df = pd.read_table(path)
-        if len(df.index) == 0:
-            return None
-        df = drop_columns_except(df, ["DOCULECT", "GLOTTOCODE"])
-        df = df.drop_duplicates()
-        df = df.rename(columns={'DOCULECT': 'ID'})
-        df = df.rename(columns={'GLOTTOCODE': 'Glottocode'})
-        return df
-
-    def get_source(self):
-        return ""
