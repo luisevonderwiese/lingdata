@@ -16,14 +16,6 @@ cldf_src_file_names = ["cldf/README.md",
                       "cldf/cognates.csv"]
 
 
-cp_user_name = "lingpy"
-cp_src_dirs = ["datasets",
-                      "trimmed",
-                      "data/correspondences"]
-cp_dest_file_names = ["dataset.tsv",
-                       "trimmed.tsv",
-                       "correspondence.tsv"]
-
 
 
 def download_file(repo, src_file_name, dest_file_name, sha):
@@ -38,10 +30,10 @@ def download_file(repo, src_file_name, dest_file_name, sha):
 
 
 
-def crawl_cldf():
-    github = Github(params.github_token)
+def crawl():
+    github = Github()
     repos = []
-    for user in params.source_types["cldf"]:
+    for user in params.sources:
         if user in params.sources:
             repos += github.get_user(user).get_repos()
     for repo in repos:
@@ -75,50 +67,3 @@ def crawl_cldf():
         except:
             print(colored(ds_id + " from " + source +  ": error occured", "red"))
             pb.rm_this_dir(download_dir)
-
-
-
-def crawl_cp():
-    source = params.source_types["correspondence"][0]
-    if not source in params.sources:
-        return
-    repo = Github(params.github_token).get_user(cp_user_name).get_repo(source)
-    commits = repo.get_commits(until = params.download_cutoff)
-    try:
-        sha = commits[0].sha
-    except: #No older commits, repo did not exist at cutoff date
-        print(colored("correspondence-pattern-data skipped", "yellow"))
-        return
-    #all files from same repo, so check only at first file
-    some_ds_id = repo.get_contents(cp_src_dirs[0], sha)[0].path.split("/")[-1].split(".")[0]
-    meta_path = os.path.join(pb.source_path("native", some_ds_id, source), "meta.json")
-    if os.path.isfile(meta_path):
-        with open(meta_path, 'r') as openfile:
-            json_data = json.load(openfile)
-        if json_data["sha"] == sha:
-            print(colored("correspondence-pattern-data up to date", "yellow"))
-            return
-    meta_dict = {"sha" : sha}
-
-    for (i, src_dir) in enumerate(cp_src_dirs):
-        repo_contents = repo.get_contents(src_dir, sha)
-        for content_file in repo_contents:
-            ds_id = content_file.path.split("/")[-1].split(".")[0]
-            source_path = pb.source_path("native", ds_id, source)
-            dest_file_name = os.path.join(source_path, cp_dest_file_names[i])
-            pb.mk_file_dir(dest_file_name)
-            try:
-                download_file(repo, content_file.path, dest_file_name, sha)
-                print(colored(ds_id + " from correspondence-pattern-data downloaded", "green"))
-            except:
-                print(colored(ds_id + " from correspondence-pattern-data: error occured", "red"))
-                pb.rm_this_dir(source_path)
-                return
-            if i == 0:
-                meta_path = os.path.join(source_path, "meta.json")
-                with open(meta_path, 'w+') as outfile:
-                    json.dump(meta_dict, outfile)
-
-def crawl():
-    crawl_cldf()
-    crawl_cp()
