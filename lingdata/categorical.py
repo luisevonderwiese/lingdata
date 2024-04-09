@@ -250,6 +250,8 @@ class CategoricalData:
             padd = "0" * diff
             binary_code = padd + binary_code
             idx = int(binary_code, 2)
+            assert(idx > 0)
+            idx = idx - 1
             assert(idx < pow(2, max_values))
             ambig_codes.append(symbols[idx])
         return ambig_codes
@@ -266,6 +268,8 @@ class CategoricalData:
                 ambig_codes.append("-")
                 continue
             idx = int(binary_code, 2)
+            assert(idx > 0)
+            idx = idx - 1
             assert(idx < pow(2, num_values))
             ambig_codes.append(symbols[idx])
         return ambig_codes
