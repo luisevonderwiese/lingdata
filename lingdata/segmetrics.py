@@ -26,7 +26,7 @@ def levenshtein(s1, s2):
                     prev_row[j - 1]    # Replace
                 )
         prev_row = curr_row.copy()
-    return 1 - (curr_row[n] / max(m, n))
+    return curr_row[n] / max(m, n)
 
 
 def jaro(s1, s2):
@@ -60,5 +60,5 @@ def jaro(s1, s2):
                 t += 1
             point += 1
     t = t//2
-
-    return (match/ m + match / n + (match - t) / match)/ 3.0
+    sim = (match/ m + match / n + (match - t) / match)/ 3.0
+    return 1 - sim
