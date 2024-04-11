@@ -19,8 +19,6 @@ def generate_membership_msa(ds_id, source, ling_type, family, dist_metric):
         return  #makes only sence for cognate data
     if family != "full":
         return #family splitting not supported
-    if source not in params.source_types["cldf"]:
-        return #only supported fopr cldf
     source_path = pb.source_path("native", ds_id, source)
     forms_path = os.path.join(source_path, "forms.csv")
     if not os.path.isfile(forms_path):
@@ -77,7 +75,7 @@ def generate_membership_msa(ds_id, source, ling_type, family, dist_metric):
                 all_segemnts_lists.append(segments_list)
             dm = [[0 for i in range(len(all_segemnts_lists))] for j in range(len(languages))]
             for i, segments_list1 in enumerate(all_segemnts_lists):
-                for j in range(i):
+                for j in range(i+1):
                     segments_list2 = all_segemnts_lists[j]
                     distances = []
                     for s1 in segments_list1:
@@ -87,10 +85,16 @@ def generate_membership_msa(ds_id, source, ling_type, family, dist_metric):
                             elif dist_metric == "jaro":
                                 distances.append(segmetrics.jaro(s1, s2))
                             elif dist_metric == "mattis":
-                                pair = pairwise.Pairwise(s1, s2)
-                                pair.align(method='sca', distance=True)
-                                distances.append(pair.alignments[0][-1])
-                    d = sum(distances) / len(distances) #maybe also min or max?
+                                try:
+                                    pair = pairwise.Pairwise(s1, s2)
+                                    pair.align(method='sca', distance=True)
+                                    distances.append(pair.alignments[0][-1])
+                                except:
+                                    continue
+                    if len(distances) == 0:
+                        d = 1.0 #not really correct, language should be removed from list. But this case is rare
+                    else:
+                        d = sum(distances) / len(distances) #maybe also min or max?
                     #print(segments_list1)
                     #print(segments_list2)
                     #print(d)
