@@ -53,7 +53,7 @@ class CategoricalData:
                 matrix[char_idx][taxon_idx].sort()
         return cls(taxon_ids, char_ids, matrix)
 
-
+    @classmethod
     def from_warnow_file(cls, path):
         input_df = pd.read_csv(path)
         char_ids = df["id"]
