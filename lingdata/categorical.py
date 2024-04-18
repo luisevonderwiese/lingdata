@@ -53,6 +53,24 @@ class CategoricalData:
                 matrix[char_idx][taxon_idx].sort()
         return cls(taxon_ids, char_ids, matrix)
 
+
+    def from_warnow_file(cls, path):
+        input_df = pd.read_csv(path)
+        char_ids = df["id"]
+        input_df = input_df.drop("id", axis=1)
+        input_df = input_df.drop("feature", axis=1)
+        input_df = input_df.drop("weight", axis=1)
+        taxon_ids = [column for column in df]
+        matrix = [[[] for taxon_idx in range(len(taxon_ids))] for char_idx in range(len(char_ids))]
+        for char_idx, row in input_df.iterrows():
+            for taxon_idx, taxon_id in enumerate(taxon_ids):
+                values = [str(val) for val in row[taxon_id].split("/")]
+                #if len(values) == 1 and values[0] == 0:
+                values.sort()
+                matrix[char_idx][taxon_idx] = values
+        return cls(taxon_ids, char_ids, matrix)
+
+
     @classmethod
     def read_values(cls, values):
         if(values == "[]"):
