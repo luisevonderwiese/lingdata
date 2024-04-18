@@ -56,7 +56,7 @@ class CategoricalData:
     @classmethod
     def from_warnow_file(cls, path):
         input_df = pd.read_csv(path)
-        char_ids = df["id"]
+        char_ids = input_df["id"]
         input_df = input_df.drop("id", axis=1)
         input_df = input_df.drop("feature", axis=1)
         input_df = input_df.drop("weight", axis=1)
