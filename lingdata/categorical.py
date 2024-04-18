@@ -60,7 +60,7 @@ class CategoricalData:
         input_df = input_df.drop("id", axis=1)
         input_df = input_df.drop("feature", axis=1)
         input_df = input_df.drop("weight", axis=1)
-        taxon_ids = [column for column in df]
+        taxon_ids = [column for column in input_df]
         matrix = [[[] for taxon_idx in range(len(taxon_ids))] for char_idx in range(len(char_ids))]
         for char_idx, row in input_df.iterrows():
             for taxon_idx, taxon_id in enumerate(taxon_ids):
