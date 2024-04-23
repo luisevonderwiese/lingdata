@@ -206,6 +206,25 @@ class CategoricalData:
             codes.append(code)
         return codes
 
+    def encode_bin_part(self, char_idx, num_values): #O(num_taxa * possible_values)
+        if len(self.get_possible_values(char_idx)) != num_values:
+            return []
+        codes = []
+        possible_values = self.get_possible_values(char_idx)
+        for taxon_idx in range(self.num_taxa()): #O(num_taxa * loop_complexity)
+            taxon_values = self.matrix[char_idx][taxon_idx]
+            if len(taxon_values) == 0: # missing information
+                codes.append("-" * len(possible_values))
+                continue
+            code = ""
+            for value in possible_values: #O(possible_values)
+                if value in taxon_values:
+                    code += "1"
+                else:
+                    code += "0"
+            codes.append(code)
+        return codes
+
     def encode_multi(self, char_idx):
         codes = []
         possible_values = self.get_possible_values(char_idx)
@@ -296,7 +315,7 @@ class CategoricalData:
             if self.is_mutlistate():
                 print(colored("multi MSA cannot be created for multistate dataset", "yellow"))
                 return None
-        if msa_type.startswith("prototype_part"):
+        if msa_type.startswith("prototype_part") or msa_type.startswith("bin_part"):
             num_values = int(msa_type.split("_")[-1])
 
         sequences = ["" for i in range(self.num_taxa())]
@@ -311,6 +330,8 @@ class CategoricalData:
                 codes = self.encode_prototype(char_idx, max_values)
             elif msa_type.startswith("prototype_part"):
                 codes = self.encode_prototype_part(char_idx, num_values)
+            elif msa_type.startswith("bin_part"):
+                codes = self.encode_bin_part(char_idx, num_values)
             if codes == []:
                 continue
             for (taxon_idx, code) in enumerate(codes):
@@ -318,6 +339,8 @@ class CategoricalData:
         if sequences[0] == "":
             return None
         if msa_type.startswith("prototype_part") and len(sequences[0]) < self.num_taxa():
+            return None
+        if msa_type.startswith("bin_part") and len(sequences[0]) < self.num_taxa() * num_values:
             return None
         records = [SeqRecord(sequences[taxon_idx],
                              id=str(self.taxon_ids[taxon_idx])) for taxon_idx in range(self.num_taxa())]
