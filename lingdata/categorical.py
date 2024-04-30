@@ -338,9 +338,11 @@ class CategoricalData:
                 sequences[taxon_idx] += code
         if sequences[0] == "":
             return None
-        if msa_type.startswith("prototype_part") and len(sequences[0]) < self.num_taxa():
-            return None
-        if msa_type.startswith("bin_part") and len(sequences[0]) < self.num_taxa() * num_values:
+        #if msa_type.startswith("prototype_part") and len(sequences[0]) < self.num_taxa():
+        #    return None
+        #if msa_type.startswith("bin_part") and len(sequences[0]) < self.num_taxa() * num_values:
+        #    return None
+        if (msa_type.startswith("prototype_part") or msa_type.startswith("bin_part")) and len(sequences[0]) == 0:
             return None
         records = [SeqRecord(sequences[taxon_idx],
                              id=str(self.taxon_ids[taxon_idx])) for taxon_idx in range(self.num_taxa())]
