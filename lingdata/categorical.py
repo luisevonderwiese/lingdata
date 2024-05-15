@@ -59,7 +59,8 @@ class CategoricalData:
         char_ids = input_df["id"]
         input_df = input_df.drop("id", axis=1)
         input_df = input_df.drop("feature", axis=1)
-        input_df = input_df.drop("weight", axis=1)
+        if "weight" in input_df.columns:
+            input_df = input_df.drop("weight", axis=1)
         input_df = input_df.astype(str)
         taxon_ids = [column for column in input_df]
         matrix = [[[] for taxon_idx in range(len(taxon_ids))] for char_idx in range(len(char_ids))]
