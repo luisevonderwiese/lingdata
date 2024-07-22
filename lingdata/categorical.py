@@ -5,6 +5,7 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Align import MultipleSeqAlignment
 from termcolor import colored
 import math
+from collections import Counter
 
 from lingdata.partitioning import Partitioning
 
@@ -382,6 +383,27 @@ class CategoricalData:
             for taxon_idx in range(self.num_taxa()):
                 if len(self.matrix[char_idx][taxon_idx]) != 0:
                     sample.matrix[char_idx][taxon_idx] = [random.choice(self.matrix[char_idx][taxon_idx])]
+        return sample
+
+    def get_clever_sample(self):
+        sample = CategoricalData()
+        sample.char_ids = self.char_ids
+        sample.taxon_ids = self.taxon_ids
+        sample.matrix = [[[] for taxon_idx in range(self.num_taxa())] for char_idx in range(self.num_chars())]
+        for char_idx in range(self.num_chars()):
+            char_values = []
+            for taxon_idx in range(self.num_taxa()):
+                char_values += self.matrix[char_idx][taxon_idx]
+                value_counts = Counter(char_values)
+            for taxon_idx in range(self.num_taxa()):
+                values = self.matrix[char_idx][taxon_idx]
+                if len(values) == 0:
+                    continue
+                selected_value = values[0]
+                for v in range(1, len(values)):
+                    if value_counts[values[v]] > value_counts[selected_value]:
+                        selected_value = values[v]
+                sample.matrix[char_idx][taxon_idx] = [selected_value]
         return sample
 
     def is_single_state(self):

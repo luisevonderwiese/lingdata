@@ -182,6 +182,8 @@ def write_csv(data_units):
         db_df.at[i, "sampled_msa_paths"] = ""
         db_df.at[i, "sampled_msa_paths"] = sampled_msa_paths
 
+        db_df.at[i, "clever_sample_path"] = data_unit.clever_sample_path()
+
         partition_paths = {}
         for [msa_type, model, gamma, mode] in params.partition_types:
             partition_path = data_unit.partition_path(msa_type, model, gamma, mode)
@@ -285,6 +287,9 @@ def compile_data_units(ds_id, source, ling_type):
 
 
 def compile_samples(data, data_unit):
+    path = data_unit.clever_sample_path()
+    sample = data.get_clever_sample()
+    sample.write_msa(path, "bin")
     for i in range(params.num_samples):
         path = data_unit.sample_path(i)
         if i == 0:
@@ -335,6 +340,9 @@ class DataUnit:
 
     def sample_path(self, i):
         return pb.sample_path(self.ds_id, self.source, self.ling_type, self.family, i)
+
+    def clever_sample_path(self):
+        return pb.clever_sample_path(self.ds_id, self.source, self.ling_type, self.family)
 
     def partition_path(self, msa_type, model, gamma, mode):
         return pb.partition_path(self.ds_id, self.source, self.ling_type, self.family, msa_type, model, gamma, mode)

@@ -79,6 +79,8 @@ def partition_name(msa_type, model, gamma, mode):
 def sample_path(ds_id, source, ling_type, family, idx):
     return os.path.join(family_path("sampled", ds_id, source, ling_type, family), "sampled" + str(idx) + "_bin.phy")
 
+def clever_sample_path(ds_id, source, ling_type, family):
+    return os.path.join(family_path("msa", ds_id, source, ling_type, family), "clever_sample_bin.phy")
 
 def charmap_path(x):
     return os.path.join(domain_path("charmaps"), "charmap_" + str(x) + ".txt")
