@@ -5,3 +5,4 @@ lingdata.egg-info/*
 lingdata/lingdata.egg-info/
 build/
 test/test_temp/
+_notes/*
